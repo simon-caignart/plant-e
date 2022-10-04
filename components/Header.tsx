@@ -1,14 +1,15 @@
-import React from "react";
+import { ArrowLeftOnRectangleIcon } from "@heroicons/react/24/solid";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { signOut, useSession } from "next-auth/react";
+import React from "react";
 
 const Header: React.FC = () => {
   const router = useRouter();
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
-  const {data: session, status} = useSession();
+  const { data: session, status } = useSession();
 
   let left = (
     <div className="left">
@@ -17,25 +18,6 @@ const Header: React.FC = () => {
           Feed
         </a>
       </Link>
-      <style jsx>{`
-        .bold {
-          font-weight: bold;
-        }
-
-        a {
-          text-decoration: none;
-          color: #000;
-          display: inline-block;
-        }
-
-        .left a[data-active="true"] {
-          color: gray;
-        }
-
-        a + a {
-          margin-left: 1rem;
-        }
-      `}</style>
     </div>
   );
 
@@ -49,35 +31,11 @@ const Header: React.FC = () => {
             Feed
           </a>
         </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: #000;
-            display: inline-block;
-          }
-
-          .left a[data-active="true"] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
       </div>
     );
     right = (
       <div className="right">
         <p>Validating session ...</p>
-        <style jsx>{`
-          .right {
-            margin-left: auto;
-          }
-        `}</style>
       </div>
     );
   }
@@ -88,27 +46,6 @@ const Header: React.FC = () => {
         <Link href="/api/auth/signin">
           <a data-active={isActive("/signup")}>Log in</a>
         </Link>
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: #000;
-            display: inline-block;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid black;
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-        `}</style>
       </div>
     );
   }
@@ -124,25 +61,6 @@ const Header: React.FC = () => {
         <Link href="/drafts">
           <a data-active={isActive("/drafts")}>My drafts</a>
         </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: #000;
-            display: inline-block;
-          }
-
-          .left a[data-active="true"] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
       </div>
     );
     right = (
@@ -150,60 +68,33 @@ const Header: React.FC = () => {
         <p>
           {session.user.name} ({session.user.email})
         </p>
-        <Link href="/create">
-          <button>
-            <a>New post</a>
-          </button>
-        </Link>
+        <img src={session.user.image} className="rounded-full" />
         <button onClick={() => signOut()}>
           <a>Log out</a>
         </button>
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: #000;
-            display: inline-block;
-          }
-
-          p {
-            display: inline-block;
-            font-size: 13px;
-            padding-right: 1rem;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid black;
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-
-          button {
-            border: none;
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
-    <nav>
-      {left}
-      {right}
-      <style jsx>{`
-        nav {
-          display: flex;
-          padding: 2rem;
-          align-items: center;
-        }
-      `}</style>
+    <nav className="flex items-center sticky top-0 left-0 right-0 bg-plant-green p-2 z-50">
+      {session && (
+        <>
+          <div className="flex-1" />
+          <button
+            className="text-white rounded-sm mr-2"
+            onClick={() => signOut()}
+          >
+            <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+          </button>
+
+          <img
+            width={45}
+            src={session.user.image}
+            className="rounded-full bg-white"
+          />
+        </>
+      )}
     </nav>
   );
 };

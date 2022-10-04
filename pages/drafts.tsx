@@ -1,8 +1,9 @@
-import React from "react";
+import { Plant } from "@prisma/client";
 import { GetServerSideProps } from "next";
+import { getSession, useSession } from "next-auth/react";
+import React from "react";
 import Layout from "../components/Layout";
-import Post, { PostProps } from "../components/Post";
-import { useSession, getSession } from "next-auth/react";
+import PlantCard from "../components/PlantCard";
 import prisma from "../lib/prisma";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
@@ -12,7 +13,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     return { props: { drafts: [] } };
   }
 
-  const drafts = await prisma.post.findMany({
+  const plants = await prisma.post.findMany({
     where: {
       author: { email: session.user.email },
       published: false,
@@ -24,12 +25,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   });
   return {
-    props: { drafts },
+    props: { plants },
   };
 };
 
 type Props = {
-  drafts: PostProps[];
+  plants: Plant[];
 };
 
 const Drafts: React.FC<Props> = (props) => {
@@ -49,27 +50,13 @@ const Drafts: React.FC<Props> = (props) => {
       <div className="page">
         <h1>My Drafts</h1>
         <main>
-          {props.drafts.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
+          {props.plants.map((plant) => (
+            <div key={plant.id} className="post">
+              <PlantCard plant={plant} />
             </div>
           ))}
         </main>
       </div>
-      <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
     </Layout>
   );
 };
