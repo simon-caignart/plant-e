@@ -31,7 +31,10 @@ const PlantCard: React.FC<{
         </p>
         <div className="flex-1" />
         <p className="font-mono text-sm text-gray-500">
-          Mis à jour: {new Date(plant.updatedAt).toLocaleTimeString()}
+          Mis à jour:{" "}
+          {plant.logs && plant.logs.length > 0
+            ? new Date(plant.logs.at(0).createdAt).toLocaleTimeString()
+            : "N/A"}
         </p>
       </section>
     </div>

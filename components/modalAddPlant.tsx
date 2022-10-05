@@ -3,19 +3,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import Router from "next/router";
 import { useState } from "react";
 import ReactDom from "react-dom";
-
-export type PlantCreateInput = {
-  id?: string;
-  name?: string;
-  latinName: string;
-  commonName: string;
-  image: string;
-  description: string;
-  luminosityThreshold: number;
-  temperatureThreshold: number;
-  humidityThreshold: number;
-  soilMoistureThreshold: number;
-};
+import { PlantCreateInput } from "../types/PlantCreateInput";
 
 export function ModalAddPlant(props: {
   plant: PlantCreateInput;

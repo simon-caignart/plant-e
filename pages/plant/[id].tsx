@@ -49,11 +49,11 @@ const Plant: React.FC<
         className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
         style={{ backgroundImage: "url(/wave.svg)" }}
       >
-        <h2 className="text-5xl text-white">{props.name}</h2>
+        <h2 className="mb-10 text-5xl text-white xl:mb-0">{props.name}</h2>
 
         <div className="grid items-center justify-center xl:grid-cols-[30%_70%]">
           <img
-            className="order-2 max-w-sm p-12 xl:order-none"
+            className="order-1 max-w-sm p-12 xl:order-none"
             src={props.image}
           />
           <section>
@@ -63,17 +63,17 @@ const Plant: React.FC<
                 <span className="ml-2 font-mono text-sm text-gray-100">
                   Mis à jour :{" "}
                   {props.logs && props.logs.length > 0
-                    ? props.logs.at(0).createdAt.toLocaleTimeString()
+                    ? new Date(props.logs.at(0).createdAt).toLocaleTimeString()
                     : "N/A"}
                 </span>
               </h2>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                   💦 Humidité dans l'air :{" "}
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).humidity} %`
-                    : "Pas de dernière mesure"}
+                    : "N/A"}
                   <span className="text-gray-600"></span>
                 </p>
 
@@ -81,7 +81,7 @@ const Plant: React.FC<
                   💦 Humidité dans le sol :{" "}
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).soilMoisture} %`
-                    : "Pas de dernière mesure"}
+                    : "N/A"}
                   <span className="text-gray-600"></span>
                 </div>
 
@@ -89,7 +89,7 @@ const Plant: React.FC<
                   💡 Luminosité:{" "}
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).luminosity} %`
-                    : "Pas de dernière mesure"}
+                    : "N/A"}
                   <span className="text-gray-600"></span>
                 </p>
 
@@ -98,7 +98,7 @@ const Plant: React.FC<
                   <span className="text-gray-600">
                     {props.logs && props.logs.length > 0
                       ? `${props.logs.at(0).temperature} °C`
-                      : "Pas de dernière mesure"}
+                      : "N/A"}
                   </span>
                 </p>
               </div>
@@ -121,15 +121,14 @@ const Plant: React.FC<
                   {props.description}
                 </p>
               </div>
-
-              <button
-                className="btn btn-error mt-10 w-44"
-                onClick={() => deletePost(props.id)}
-              >
-                Supprimer
-              </button>
             </div>
           </section>
+          <button
+            className="btn btn-error mt-10 w-44"
+            onClick={() => deletePost(props.id)}
+          >
+            Supprimer
+          </button>
         </div>
       </div>
     </Layout>
