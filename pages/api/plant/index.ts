@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
-import { PlantCreateInput } from "../../../components/modalAddPlant";
 import prisma from "../../../lib/prisma";
+import { PlantCreateInput } from "../../../types/PlantCreateInput";
 
 // POST /api/plant
 // Create a new plant

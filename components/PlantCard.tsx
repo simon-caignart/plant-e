@@ -1,6 +1,7 @@
 import { Plant, PlantLog } from "@prisma/client";
 import Router from "next/router";
 import React from "react";
+import { fromDate } from "../functions/localTimeString";
 
 const PlantCard: React.FC<{
   plant: Plant & {
@@ -18,22 +19,22 @@ const PlantCard: React.FC<{
       <section className="flex h-full flex-col gap-2">
         <h2 className="text-3xl font-bold">{plant.name}</h2>
         <p className="text-lg">
-          💦{" : "}
-          {plant.logs && plant.logs.length > 1
+          🪴{" : "}
+          {plant.logs && plant.logs.length > 0
             ? `${plant.logs.at(0).soilMoisture} %`
             : "N/A"}
         </p>
         <p className="text-lg">
           💡{" : "}
-          {plant.logs && plant.logs.length > 1
+          {plant.logs && plant.logs.length > 0
             ? `${plant.logs.at(0).luminosity} %`
             : "N/A"}
         </p>
         <div className="flex-1" />
         <p className="font-mono text-sm text-gray-500">
-          Mis à jour:{" "}
+          Mis à jour{" "}
           {plant.logs && plant.logs.length > 0
-            ? new Date(plant.logs.at(0).createdAt).toLocaleTimeString()
+            ? fromDate(new Date(plant.logs.at(0).createdAt))
             : "N/A"}
         </p>
       </section>

@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import Router from "next/router";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/SignIn";
+import { fromDate } from "../../functions/localTimeString";
 import prisma from "../../lib/prisma";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
@@ -61,9 +62,9 @@ const Plant: React.FC<
               <h2 className="mb-4 text-2xl text-white">
                 📈 Statistiques de votre plante{" "}
                 <span className="ml-2 font-mono text-sm text-gray-100">
-                  Mis à jour :{" "}
+                  Mis à jour{" "}
                   {props.logs && props.logs.length > 0
-                    ? new Date(props.logs.at(0).createdAt).toLocaleTimeString()
+                    ? fromDate(new Date(props.logs.at(0).createdAt))
                     : "N/A"}
                 </span>
               </h2>
@@ -78,7 +79,7 @@ const Plant: React.FC<
                 </p>
 
                 <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💦 Humidité dans le sol :{" "}
+                  🪴 Humidité dans le sol :{" "}
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).soilMoisture} %`
                     : "N/A"}
