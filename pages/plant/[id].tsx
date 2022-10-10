@@ -58,6 +58,12 @@ const Plant: React.FC<
             src={props.image}
           />
           <section>
+            <button
+              className="btn btn-primary mt-10 w-44"
+              onClick={() => deletePost(props.id)}
+            >
+              Supprimer
+            </button>
             <div className="flex flex-col gap-1">
               <h2 className="mb-4 text-2xl text-white">
                 📈 Statistiques de votre plante{" "}
@@ -122,14 +128,14 @@ const Plant: React.FC<
                   {props.description}
                 </p>
               </div>
+              <button
+                className="btn btn-error mt-10 w-44"
+                onClick={() => deletePost(props.id)}
+              >
+                Supprimer
+              </button>
             </div>
           </section>
-          <button
-            className="btn btn-error mt-10 w-44"
-            onClick={() => deletePost(props.id)}
-          >
-            Supprimer
-          </button>
         </div>
       </div>
     </Layout>
