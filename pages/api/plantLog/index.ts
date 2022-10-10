@@ -4,7 +4,6 @@ import { PlantLogCreateInput } from "./../../../types/PlantLogCreateInput";
 // POST /api/plantLog
 export default async function handle(req, res) {
   const plantLog: PlantLogCreateInput = req.body;
-
   let needToWater = false;
 
   // Check if the user asked to water a plant
@@ -18,7 +17,7 @@ export default async function handle(req, res) {
   });
 
   if (lastPlantLog) {
-    if (lastPlantLog.needToWater && !lastPlantLog.wasWatered) {
+    if (lastPlantLog.needToWater) {
       needToWater = true;
     }
   }
@@ -35,6 +34,26 @@ export default async function handle(req, res) {
     if (plantLog.soilMoisture < plant.soilMoistureThreshold) {
       needToWater = true;
     }
+
+    const lastWatered = await prisma.plantLog.findFirst({
+      where: {
+        plantId: plantLog.plantId,
+        wasWatered: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const lastTimeWatered = new Date(lastWatered.createdAt);
+    const now = new Date();
+
+    const diff = now.getTime() - lastTimeWatered.getTime();
+    const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+
+    if (diffDays > plant.wateringFrequency) {
+      needToWater = true;
+    }
   }
 
   const result = await prisma.plantLog.create({
@@ -45,7 +64,7 @@ export default async function handle(req, res) {
       waterLevelToLow: plantLog.waterLevelToLow,
       temperature: plantLog.temperature,
       wasWatered: needToWater,
-      needToWater: needToWater,
+      needToWater: false,
       plant: { connect: { id: plantLog.plantId } },
     },
   });
