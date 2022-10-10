@@ -56,7 +56,7 @@ export default async function handle(req, res) {
     }
   }
 
-  const result = await prisma.plantLog.create({
+  await prisma.plantLog.create({
     data: {
       humidity: plantLog.humidity,
       luminosity: plantLog.luminosity,
@@ -69,5 +69,9 @@ export default async function handle(req, res) {
     },
   });
 
-  res.json(result);
+  res.json({
+    message: "Plant log created",
+    needToWater: needToWater,
+    waterQuantity: plant.waterQuantity,
+  });
 }
