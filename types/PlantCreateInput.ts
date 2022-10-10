@@ -5,6 +5,8 @@ export type PlantCreateInput = {
   commonName: string;
   image: string;
   description: string;
+  wateringFrequency: number;
+  waterQuantity: number;
   luminosityThreshold: number;
   temperatureThreshold: number;
   humidityThreshold: number;

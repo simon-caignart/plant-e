@@ -6,20 +6,22 @@ import { PlantCreateInput } from "../../../types/PlantCreateInput";
 // Create a new plant
 export default async function handle(req, res) {
   console.log("req.body", req.body);
-  const plant: PlantCreateInput = req.body;
+  const plantCreateInput: PlantCreateInput = req.body;
   const session = await getSession({ req });
   const result = await prisma.plant.create({
     data: {
-      id: plant.id,
-      name: plant.name,
-      latinName: plant.latinName,
-      commonName: plant.commonName,
-      image: plant.image,
-      description: plant.description,
-      luminosityThreshold: plant.luminosityThreshold,
-      temperatureThreshold: plant.temperatureThreshold,
-      humidityThreshold: plant.humidityThreshold,
-      soilMoistureThreshold: plant.soilMoistureThreshold,
+      id: plantCreateInput.id,
+      name: plantCreateInput.name,
+      latinName: plantCreateInput.latinName,
+      commonName: plantCreateInput.commonName,
+      image: plantCreateInput.image,
+      description: plantCreateInput.description,
+      wateringFrequency: plantCreateInput.wateringFrequency,
+      waterQuantity: plantCreateInput.waterQuantity,
+      luminosityThreshold: plantCreateInput.luminosityThreshold,
+      temperatureThreshold: plantCreateInput.temperatureThreshold,
+      humidityThreshold: plantCreateInput.humidityThreshold,
+      soilMoistureThreshold: plantCreateInput.soilMoistureThreshold,
       user: { connect: { email: session?.user?.email } },
     },
   });
