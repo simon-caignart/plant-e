@@ -81,8 +81,10 @@ model Plant {
   image                 String?
   description           String?
   logs                  PlantLog[]
+  wateringFrequency     Int?
   luminosityThreshold   Int?
   temperatureThreshold  Int?
+  waterQuantity         Int?
   humidityThreshold     Int?
   soilMoistureThreshold Int?
   createdAt             DateTime   @default(now()) @map(name: "created_at")
@@ -99,6 +101,7 @@ model PlantLog {
   humidity        Int
   waterLevelToLow Boolean
   wasWatered      Boolean
+  needToWater     Boolean  @default(false)
   plantId         String   @map("plant_id")
   plant           Plant    @relation(fields: [plantId], references: [id])
   createdAt       DateTime @default(now()) @map(name: "created_at")

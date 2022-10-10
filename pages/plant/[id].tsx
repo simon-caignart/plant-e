@@ -1,7 +1,19 @@
 import { Plant, PlantLog } from "@prisma/client";
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
 import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import Router from "next/router";
+import { Line } from "react-chartjs-2";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/SignIn";
 import { fromDate } from "../../functions/localTimeString";
@@ -33,6 +45,77 @@ async function deletePost(id: string): Promise<void> {
   Router.push("/");
 }
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
+
+export const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+      position: "top" as const,
+    },
+    title: {
+      display: false,
+    },
+  },
+};
+
+const labels = ["January", "February", "March", "April", "May", "June", "July"];
+
+export const luminosityData = {
+  labels,
+  datasets: [
+    {
+      fill: true,
+      label: "Luminosité",
+      data: labels.map(() => {
+        return Math.random() * 100;
+      }),
+      borderColor: "rgba(255, 222, 105, 0.5)",
+      backgroundColor: "rgba(254, 242, 205, 0.6)",
+    },
+  ],
+};
+
+export const soilMoistureData = {
+  labels,
+  datasets: [
+    {
+      fill: true,
+      label: "Humidité du sol",
+      data: labels.map(() => {
+        return Math.random() * 100;
+      }),
+      borderColor: "rgba(255, 148, 62, 0.3)",
+      backgroundColor: "rgba(92, 159, 27, 0.4)",
+    },
+  ],
+};
+
+export const humidityData = {
+  labels,
+  datasets: [
+    {
+      fill: true,
+      label: "Humidité",
+      data: labels.map(() => {
+        return Math.random() * 100;
+      }),
+      borderColor: "rgba(0, 168, 243, 0.3)",
+      backgroundColor: "rgba(127, 237, 254, 0.3)",
+    },
+  ],
+};
+
 const Plant: React.FC<
   Plant & {
     logs: PlantLog[];
@@ -52,9 +135,9 @@ const Plant: React.FC<
       >
         <h2 className="mb-10 text-5xl text-white xl:mb-0">{props.name}</h2>
 
-        <div className="grid items-center justify-center xl:grid-cols-[30%_70%]">
+        <div className="grid justify-center xl:grid-cols-[30%_70%]">
           <img
-            className="order-1 max-w-sm p-12 xl:order-none"
+            className="order-1 mt-16 max-w-sm p-12 xl:order-none"
             src={props.image}
           />
           <section>
@@ -75,7 +158,7 @@ const Plant: React.FC<
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).humidity} %`
                     : "N/A"}
-                  <span className="text-gray-600"></span>
+                  <Line options={options} data={humidityData} />
                 </p>
 
                 <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
@@ -83,7 +166,7 @@ const Plant: React.FC<
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).soilMoisture} %`
                     : "N/A"}
-                  <span className="text-gray-600"></span>
+                  <Line options={options} data={soilMoistureData} />
                 </div>
 
                 <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
@@ -91,7 +174,7 @@ const Plant: React.FC<
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).luminosity} %`
                     : "N/A"}
-                  <span className="text-gray-600"></span>
+                  <Line options={options} data={luminosityData} />
                 </p>
 
                 <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
