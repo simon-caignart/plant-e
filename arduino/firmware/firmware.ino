@@ -30,7 +30,7 @@ String waterLevelToLow = "false";
 #define POWER_PIN_SOIL_MOISTURE_SENSOR 8
 #define SIGNAL_PIN_SOIL_MOISTURE_SENSOR A1
 const int dryValue = 680;  
-const int wetValue = 365;
+const int wetValue = 340;
 int soilMoistureValue = 0;
 int soilMoisturePercent = 0;
 
@@ -38,6 +38,9 @@ int soilMoisturePercent = 0;
 #define POWER_PIN_LIGHT_SENSOR 6
 #define SIGNAL_PIN_LIGHT_SENSOR A2
 int luminosityValue = 0;
+int luminosityPercent = 0;
+const int highLuminosityValue = 1000;  
+const int lowLuminosityValue = 0;
 
 // HUMIDITY & TEMPERATURE SENSOR CONFIG
 #include "DHT.h"
@@ -130,7 +133,13 @@ void loop() {
   delay(100);
   luminosityValue = analogRead(SIGNAL_PIN_LIGHT_SENSOR);
   digitalWrite(POWER_PIN_LIGHT_SENSOR, LOW);
-  Serial.println(luminosityValue);
+  
+  luminosityPercent = map(luminosityValue, lowLuminosityValue, highLuminosityValue, 0, 100);
+
+  Serial.print(luminosityPercent);
+  Serial.print("% (");
+  Serial.print(luminosityValue);
+  Serial.println(")");
 
   // HUMIDITY AND TEMPERATURE 
   float humidityValue = dht.readHumidity();
@@ -151,10 +160,11 @@ void loop() {
 
   Serial.println("");
   Serial.println("📮 Posting Data...");
+  Serial.println("");
 
   // Post Data
   String contentType = "application/json";
-  String data = "{\"plantId\": \"" + plantId + "\",\"humidity\": " + round(humidityValue) + ",\"luminosity\": " + round(luminosityValue) +  ",\"soilMoisture\": " + round(soilMoisturePercent) + ",\"waterLevelToLow\":" + waterLevelToLow + ",\"temperature\": " + round(temperatureValue) + "}";
+  String data = "{\"plantId\": \"" + plantId + "\",\"humidity\": " + round(humidityValue) + ",\"luminosity\": " + round(luminosityPercent) +  ",\"soilMoisture\": " + round(soilMoisturePercent) + ",\"waterLevelToLow\":" + waterLevelToLow + ",\"temperature\": " + round(temperatureValue) + "}";
 
   client.post("/api/plantLog", contentType, data );
 

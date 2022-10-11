@@ -116,6 +116,21 @@ export const humidityData = {
   ],
 };
 
+export const temperatureData = {
+  labels,
+  datasets: [
+    {
+      fill: true,
+      label: "Temperature",
+      data: labels.map(() => {
+        return Math.random() * 100;
+      }),
+      borderColor: "rgba(205, 32, 38, 0.3)",
+      backgroundColor: "rgba(255, 43, 58, 0.3)",
+    },
+  ],
+};
+
 const Plant: React.FC<
   Plant & {
     logs: PlantLog[];
@@ -153,38 +168,67 @@ const Plant: React.FC<
               </h2>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💦 Humidité dans l'air :{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).humidity} %`
-                    : "N/A"}
-                  <Line options={options} data={humidityData} />
-                </p>
-
                 <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  🪴 Humidité dans le sol :{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).soilMoisture} %`
-                    : "N/A"}
-                  <Line options={options} data={soilMoistureData} />
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      💦 Humidité dans l'air :{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).humidity} %`
+                        : "N/A"}{" "}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={humidityData} />
+                    </div>
+                  </div>
                 </div>
 
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💡 Luminosité:{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).luminosity} %`
-                    : "N/A"}
-                  <Line options={options} data={luminosityData} />
-                </p>
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      🪴 Humidité dans le sol :{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).soilMoisture} %`
+                        : "N/A"}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={soilMoistureData} />
+                    </div>
+                  </div>
+                </div>
 
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  🌡️ Température:{" "}
-                  <span className="text-gray-600">
-                    {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).temperature} °C`
-                      : "N/A"}
-                  </span>
-                </p>
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      💡 Luminosité:{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).luminosity} %`
+                        : "N/A"}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={luminosityData} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      🌡️ Température:{" "}
+                      <span className="text-gray-600">
+                        {props.logs && props.logs.length > 0
+                          ? `${props.logs.at(0).temperature} °C`
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={temperatureData} />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <h2 className="mb-4 mt-10 text-2xl text-white">
