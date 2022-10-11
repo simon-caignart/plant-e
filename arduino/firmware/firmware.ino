@@ -1,10 +1,11 @@
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
+#include <ArduinoJson.h>
 
 // PLANT CONFIG
 const String plantId = "sdfsdf";
 
-// WIFI CONFIGURATION
+// WIFI CONFIG
 WiFiSSLClient wifi;
 
 char ssid[] = "HUAWEI P30 Pro"; 
@@ -16,16 +17,20 @@ const char serverName[] = "arroseur2000.vercel.app";
 int port = 443;
 HttpClient client = HttpClient( wifi, serverName, port );
 
+// JSON CONFIG
+StaticJsonDocument<128> jsonDoc;
+
 // WATER LEVEL SENSOR CONFIG
 #define POWER_PIN_WATER_LEVEL_SENSOR  9
 #define SIGNAL_PIN_WATER_LEVEL_SENSOR A0
 int waterLevelValue = 0;
+String waterLevelToLow = "false";
 
 // SOIL MOISTURE SENSOR CONFIG
 #define POWER_PIN_SOIL_MOISTURE_SENSOR 8
 #define SIGNAL_PIN_SOIL_MOISTURE_SENSOR A1
 const int dryValue = 680;  
-const int wetValue = 350;
+const int wetValue = 365;
 int soilMoistureValue = 0;
 int soilMoisturePercent = 0;
 
@@ -79,8 +84,10 @@ void loop() {
 
   if (waterLevelValue <= 100) {
     Serial.print("🥛 Water Level: Empty");
+    waterLevelToLow = "true";
   } else if (waterLevelValue > 100 && waterLevelValue <= 300) {
     Serial.print("🥛 Water Level: Low");
+    waterLevelToLow = "true";
   } else if (waterLevelValue > 300 && waterLevelValue <= 330) {
     Serial.print("🥛 Water Level: Medium");
   } else if (waterLevelValue > 330) {
@@ -99,7 +106,6 @@ void loop() {
   digitalWrite(POWER_PIN_SOIL_MOISTURE_SENSOR, LOW);
 
   soilMoisturePercent = map(soilMoistureValue, dryValue, wetValue, 0, 100);
-
   Serial.print("🪴 Soil Moisture: ");
   
   if (soilMoistureValue <= wetValue) {
@@ -144,11 +150,11 @@ void loop() {
   Serial.println(F("°C"));
 
   Serial.println("");
-  Serial.println("Posting Data...");
+  Serial.println("📮 Posting Data...");
 
   // Post Data
   String contentType = "application/json";
-  String data = "{\"plantId\": \"" + plantId + "\",\"humidity\": " + humidityValue + ",\"luminosity\": " + luminosityValue +  ",\"soilMoisture\": " + soilMoistureValue + ",\"waterLevelToLow\": true,\"temperature\": " + temperatureValue + "}";
+  String data = "{\"plantId\": \"" + plantId + "\",\"humidity\": " + round(humidityValue) + ",\"luminosity\": " + round(luminosityValue) +  ",\"soilMoisture\": " + round(soilMoisturePercent) + ",\"waterLevelToLow\":" + waterLevelToLow + ",\"temperature\": " + round(temperatureValue) + "}";
 
   client.post("/api/plantLog", contentType, data );
 
@@ -160,6 +166,19 @@ void loop() {
   Serial.print( "Response: " );
   Serial.println( response );
 
+  DeserializationError error = deserializeJson(jsonDoc, response);
+
+  bool needToWater = jsonDoc["needToWater"];
+  int waterQuantity = jsonDoc["waterQuantity"];
+
+  Serial.println("");
+  if(needToWater) {
+    Serial.println("Je dois être arrosé 💦 😏");
+  } else {
+    Serial.println("J'ai pu soif c bon 👍");
+  }
+  Serial.println(""); 
+  
   Serial.println( "Wait 10 seconds" );
   delay(10000);
 

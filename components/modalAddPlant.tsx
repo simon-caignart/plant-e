@@ -88,7 +88,7 @@ export function ModalAddPlant(props: {
               />
             </div>
 
-            <div className="collapse-arrow collapse ">
+            <div className="collapse collapse-arrow ">
               <input type="checkbox" />
               <div className="collapse-title mt-2 pl-0 text-lg font-medium">
                 Voir plus d'informations
