@@ -29,6 +29,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
         orderBy: {
           createdAt: "desc",
         },
+        take: 480,
       },
     },
   });
@@ -38,105 +39,102 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   };
 };
 
-async function deletePost(id: string): Promise<void> {
-  await fetch(`/api/plant/${id}`, {
-    method: "DELETE",
-  });
-  Router.push("/");
-}
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
-
-export const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: false,
-      position: "top" as const,
-    },
-    title: {
-      display: false,
-    },
-  },
-};
-
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
-
-export const luminosityData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Luminosité",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(255, 222, 105, 0.5)",
-      backgroundColor: "rgba(254, 242, 205, 0.6)",
-    },
-  ],
-};
-
-export const soilMoistureData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Humidité du sol",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(255, 148, 62, 0.3)",
-      backgroundColor: "rgba(92, 159, 27, 0.4)",
-    },
-  ],
-};
-
-export const humidityData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Humidité",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(0, 168, 243, 0.3)",
-      backgroundColor: "rgba(127, 237, 254, 0.3)",
-    },
-  ],
-};
-
-export const temperatureData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Temperature",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(205, 32, 38, 0.3)",
-      backgroundColor: "rgba(255, 43, 58, 0.3)",
-    },
-  ],
-};
-
 const Plant: React.FC<
   Plant & {
     logs: PlantLog[];
   }
 > = (props) => {
   const { data: session } = useSession();
+
+  async function deletePost(id: string): Promise<void> {
+    await fetch(`/api/plant/${id}`, {
+      method: "DELETE",
+    });
+    Router.push("/");
+  }
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    Legend
+  );
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+        position: "top" as const,
+      },
+      title: {
+        display: false,
+      },
+    },
+  };
+
+  // const labels = ["January", "February", "March", "April", "May", "June", "July"];
+
+  const luminosityData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Luminosité",
+        data: props.logs.map((log) => {
+          return log.luminosity;
+        }),
+        borderColor: "rgba(255, 222, 105, 0.5)",
+        backgroundColor: "rgba(254, 242, 205, 0.6)",
+      },
+    ],
+  };
+
+  const soilMoistureData = {
+    // labels,
+    datasets: [
+      {
+        fill: true,
+        label: "Humidité du sol",
+        data: props.logs.map((log) => {
+          return log.soilMoisture;
+        }),
+        borderColor: "rgba(255, 148, 62, 0.3)",
+        backgroundColor: "rgba(92, 159, 27, 0.4)",
+      },
+    ],
+  };
+
+  const humidityData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Humidité",
+        data: props.logs.map((log) => {
+          return log.humidity;
+        }),
+        borderColor: "rgba(0, 168, 243, 0.3)",
+        backgroundColor: "rgba(127, 237, 254, 0.3)",
+      },
+    ],
+  };
+
+  const temperatureData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Temperature",
+        data: props.logs.map((log) => {
+          return log.temperature;
+        }),
+        borderColor: "rgba(205, 32, 38, 0.3)",
+        backgroundColor: "rgba(255, 43, 58, 0.3)",
+      },
+    ],
+  };
 
   if (!session) {
     return <SignIn />;

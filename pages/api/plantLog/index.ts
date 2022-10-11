@@ -45,14 +45,16 @@ export default async function handle(req, res) {
       },
     });
 
-    const lastTimeWatered = new Date(lastWatered.createdAt);
-    const now = new Date();
+    if (lastWatered) {
+      const lastTimeWatered = new Date(lastWatered.createdAt);
+      const now = new Date();
 
-    const diff = now.getTime() - lastTimeWatered.getTime();
-    const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+      const diff = now.getTime() - lastTimeWatered.getTime();
+      const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
 
-    if (diffDays > plant.wateringFrequency) {
-      needToWater = true;
+      if (diffDays > plant.wateringFrequency) {
+        needToWater = true;
+      }
     }
   }
 
