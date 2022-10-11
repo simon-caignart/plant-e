@@ -16,6 +16,8 @@ export function ModalAddPlant(props: {
     commonName: props.plant.commonName,
     image: props.plant.image,
     description: props.plant.description,
+    wateringFrequency: props.plant.wateringFrequency,
+    waterQuantity: props.plant.waterQuantity,
     luminosityThreshold: props.plant.luminosityThreshold,
     temperatureThreshold: props.plant.temperatureThreshold,
     humidityThreshold: props.plant.humidityThreshold,
