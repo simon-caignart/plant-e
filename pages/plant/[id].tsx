@@ -31,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
         orderBy: {
           createdAt: "desc",
         },
+        take: 480,
       },
     },
   });
@@ -38,84 +39,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   return {
     props: JSON.parse(JSON.stringify(plant)),
   };
-};
-
-async function deletePost(id: string): Promise<void> {
-  await fetch(`/api/plant/${id}`, {
-    method: "DELETE",
-  });
-  Router.push("/");
-}
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
-
-export const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: false,
-      position: "top" as const,
-    },
-    title: {
-      display: false,
-    },
-  },
-};
-
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
-
-export const luminosityData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Luminosité",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(255, 222, 105, 0.5)",
-      backgroundColor: "rgba(254, 242, 205, 0.6)",
-    },
-  ],
-};
-
-export const soilMoistureData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Humidité du sol",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(255, 148, 62, 0.3)",
-      backgroundColor: "rgba(92, 159, 27, 0.4)",
-    },
-  ],
-};
-
-export const humidityData = {
-  labels,
-  datasets: [
-    {
-      fill: true,
-      label: "Humidité",
-      data: labels.map(() => {
-        return Math.random() * 100;
-      }),
-      borderColor: "rgba(0, 168, 243, 0.3)",
-      backgroundColor: "rgba(127, 237, 254, 0.3)",
-    },
-  ],
 };
 
 const Plant: React.FC<
@@ -126,6 +49,95 @@ const Plant: React.FC<
   const { data: session } = useSession();
 
   const [showModal, setShowModal] = useState(false);
+  async function deletePost(id: string): Promise<void> {
+    await fetch(`/api/plant/${id}`, {
+      method: "DELETE",
+    });
+    Router.push("/");
+  }
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    Legend
+  );
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+        position: "top" as const,
+      },
+      title: {
+        display: false,
+      },
+    },
+  };
+
+  // const labels = ["January", "February", "March", "April", "May", "June", "July"];
+
+  const luminosityData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Luminosité",
+        data: props.logs.map((log) => {
+          return log.luminosity;
+        }),
+        borderColor: "rgba(255, 222, 105, 0.5)",
+        backgroundColor: "rgba(254, 242, 205, 0.6)",
+      },
+    ],
+  };
+
+  const soilMoistureData = {
+    // labels,
+    datasets: [
+      {
+        fill: true,
+        label: "Humidité du sol",
+        data: props.logs.map((log) => {
+          return log.soilMoisture;
+        }),
+        borderColor: "rgba(255, 148, 62, 0.3)",
+        backgroundColor: "rgba(92, 159, 27, 0.4)",
+      },
+    ],
+  };
+
+  const humidityData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Humidité",
+        data: props.logs.map((log) => {
+          return log.humidity;
+        }),
+        borderColor: "rgba(0, 168, 243, 0.3)",
+        backgroundColor: "rgba(127, 237, 254, 0.3)",
+      },
+    ],
+  };
+
+  const temperatureData = {
+    datasets: [
+      {
+        fill: true,
+        label: "Temperature",
+        data: props.logs.map((log) => {
+          return log.temperature;
+        }),
+        borderColor: "rgba(205, 32, 38, 0.3)",
+        backgroundColor: "rgba(255, 43, 58, 0.3)",
+      },
+    ],
+  };
 
   if (!session) {
     return <SignIn />;
@@ -181,38 +193,67 @@ const Plant: React.FC<
               </h2>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💦 Humidité dans l'air :{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).humidity} %`
-                    : "N/A"}
-                  <Line options={options} data={humidityData} />
-                </p>
-
                 <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  🪴 Humidité dans le sol :{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).soilMoisture} %`
-                    : "N/A"}
-                  <Line options={options} data={soilMoistureData} />
+                  <div className="collapse collapse-arrow">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      💦 Humidité dans l'air :{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).humidity} %`
+                        : "N/A"}{" "}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={humidityData} />
+                    </div>
+                  </div>
                 </div>
 
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💡 Luminosité :{" "}
-                  {props.logs && props.logs.length > 0
-                    ? `${props.logs.at(0).luminosity} %`
-                    : "N/A"}
-                  <Line options={options} data={luminosityData} />
-                </p>
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      🪴 Humidité dans le sol :{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).soilMoisture} %`
+                        : "N/A"}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={soilMoistureData} />
+                    </div>
+                  </div>
+                </div>
 
-                <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  🌡️ Température :{" "}
-                  <span className="text-gray-600">
-                    {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).temperature} °C`
-                      : "N/A"}
-                  </span>
-                </p>
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      💡 Luminosité:{" "}
+                      {props.logs && props.logs.length > 0
+                        ? `${props.logs.at(0).luminosity} %`
+                        : "N/A"}
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={luminosityData} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                  <div className="collapse-arrow collapse">
+                    <input type="checkbox" />
+                    <div className="collapse-title">
+                      🌡️ Température:{" "}
+                      <span className="text-gray-600">
+                        {props.logs && props.logs.length > 0
+                          ? `${props.logs.at(0).temperature} °C`
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="collapse-content">
+                      <Line options={options} data={temperatureData} />
+                    </div>
+                  </div>
+                </div>
               </div>
               <h2 className="mb-4 mt-10 text-2xl text-white">
                 🤖 Seuils pour arrosage automatique{" "}
