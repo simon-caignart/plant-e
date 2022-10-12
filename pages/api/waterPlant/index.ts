@@ -1,6 +1,6 @@
 import prisma from "../../../lib/prisma";
 
-type WaterPlantInput = {
+export type WaterPlantInput = {
   plantId: string;
 };
 
@@ -25,7 +25,7 @@ export default async function handle(req, res) {
         id: lastPlantLog.id,
       },
       data: {
-        wasWatered: true,
+        needToWater: true,
       },
     });
     // if lastPlantLog doesn't exist, create a new plant log and say it needs to be watered

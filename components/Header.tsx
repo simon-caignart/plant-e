@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
+
 const Header: React.FC = () => {
   const router = useRouter();
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
   const { data: session, status } = useSession();
+
+  const showHeader = router.pathname === "/" ? false : true;
 
   let left = (
     <div className="left">
@@ -77,12 +80,22 @@ const Header: React.FC = () => {
   }
 
   return (
-    <nav className="flex items-center sticky top-0 left-0 right-0 bg-plant-green p-2 z-50">
+    <nav className="sticky top-0 left-0 right-0 z-50 flex items-center bg-plant-green p-2">
       {session && (
         <>
+          {showHeader && (
+            <button
+              className="btn btn-error w-44 text-white shadow-lg"
+              onClick={() => router.back()}
+            >
+              ⇦ Retour
+            </button>
+          )}
+
           <div className="flex-1" />
+
           <button
-            className="text-white rounded-sm mr-2"
+            className="mr-2 rounded-sm text-white"
             onClick={() => signOut()}
           >
             <ArrowLeftOnRectangleIcon className="h-6 w-6" />

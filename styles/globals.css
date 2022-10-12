@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.waterAPlant:hover span {
+  display: none;
+}
+
+.waterAPlant:hover:before {
+  content: "💦";
+  font-size: 4rem;
+}

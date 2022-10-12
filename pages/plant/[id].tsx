@@ -13,8 +13,10 @@ import {
 import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import Router from "next/router";
+import { useState } from "react";
 import { Line } from "react-chartjs-2";
 import Layout from "../../components/Layout";
+import { ModalTreshold } from "../../components/modalTreshold";
 import { SignIn } from "../../components/SignIn";
 import { fromDate } from "../../functions/localTimeString";
 import prisma from "../../lib/prisma";
@@ -123,6 +125,8 @@ const Plant: React.FC<
 > = (props) => {
   const { data: session } = useSession();
 
+  const [showModal, setShowModal] = useState(false);
+
   if (!session) {
     return <SignIn />;
   }
@@ -133,20 +137,38 @@ const Plant: React.FC<
         className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
         style={{ backgroundImage: "url(/wave.svg)" }}
       >
-        <h2 className="mb-10 text-5xl text-white xl:mb-0">{props.name}</h2>
+        <h2 className="plantTitle mb-10 text-5xl font-bold text-white xl:mb-0">
+          {props.name}
+        </h2>
 
         <div className="grid justify-center xl:grid-cols-[30%_70%]">
-          <img
-            className="order-1 mt-16 max-w-sm p-12 xl:order-none"
-            src={props.image}
-          />
           <section>
-            <button
-              className="btn btn-primary mt-10 w-44"
-              onClick={() => deletePost(props.id)}
-            >
-              Supprimer
-            </button>
+            <img
+              className="order-1 mt-16 max-w-sm p-12 xl:order-none"
+              src={props.image}
+            />
+            {/* <h2 className="mb-4 mt-10 text-2xl text-white">
+              🗒️ Notes
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                ✏️
+              </button>
+            </h2> */}
+          </section>
+
+          <section>
+            <div className="flex items-center justify-center">
+              <button
+                className="waterAPlant btn btn-accent flex h-32 w-60 items-center justify-center rounded-3xl text-xl font-bold text-white shadow-lg"
+                onClick={() => waterAPlant(props.id)}
+              >
+                <span>Arroser la plante</span>
+              </button>
+            </div>
+
             <div className="flex flex-col gap-1">
               <h2 className="mb-4 text-2xl text-white">
                 📈 Statistiques de votre plante{" "}
@@ -176,7 +198,7 @@ const Plant: React.FC<
                 </div>
 
                 <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  💡 Luminosité:{" "}
+                  💡 Luminosité :{" "}
                   {props.logs && props.logs.length > 0
                     ? `${props.logs.at(0).luminosity} %`
                     : "N/A"}
@@ -184,7 +206,7 @@ const Plant: React.FC<
                 </p>
 
                 <p className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  🌡️ Température:{" "}
+                  🌡️ Température :{" "}
                   <span className="text-gray-600">
                     {props.logs && props.logs.length > 0
                       ? `${props.logs.at(0).temperature} °C`
@@ -192,27 +214,94 @@ const Plant: React.FC<
                   </span>
                 </p>
               </div>
-
+              <h2 className="mb-4 mt-10 text-2xl text-white">
+                🤖 Seuils pour arrosage automatique{" "}
+                <button
+                  onClick={() => {
+                    setShowModal(true);
+                  }}
+                >
+                  ✏️
+                </button>
+              </h2>
+              <div className="rounded-xl bg-white p-4 shadow-xl">
+                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+                  <div>
+                    <span className="font-bold">Fréquence d'arrosage :</span>
+                    <p>
+                      {props.wateringFrequency == null
+                        ? "Aucune Valeur"
+                        : props.wateringFrequency}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold">Quantité d'arrosage :</span>
+                    <p>
+                      {props.waterQuantity == null
+                        ? "Aucune Valeur"
+                        : props.waterQuantity}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold">
+                      Seuil d'humidité de la terre :
+                    </span>
+                    <p>
+                      {props.soilMoistureThreshold == 0
+                        ? "Aucune Valeur"
+                        : props.soilMoistureThreshold}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold">
+                      Seuil d'humidité extérieure :
+                    </span>
+                    <p>
+                      {props.humidityThreshold == 0
+                        ? "Aucune Valeur"
+                        : props.humidityThreshold}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold">
+                      Seuil de température extérieure :
+                    </span>
+                    <p>
+                      {props.temperatureThreshold == 0
+                        ? "Aucune Valeur"
+                        : props.temperatureThreshold}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold">Seuil de luminosité :</span>
+                    <p>
+                      {props.luminosityThreshold == 0
+                        ? "Aucune Valeur"
+                        : props.luminosityThreshold}
+                    </p>
+                  </div>
+                </div>
+              </div>
               <h2 className="mb-4 mt-10 text-2xl text-white">
                 ℹ️ Informations sur votre plante
               </h2>
 
               <div className="rounded-xl bg-white p-4 shadow-xl">
                 <p>
-                  <span className="font-bold">Nom commun</span>:{" "}
+                  <span className="font-bold">Nom commun :</span>{" "}
                   {props.commonName}
                 </p>
                 <p>
-                  <span className="font-bold">Nom latin</span>:{" "}
+                  <span className="font-bold">Nom latin :</span>{" "}
                   {props.latinName}
                 </p>
                 <p>
-                  <span className="font-bold">Description:</span>{" "}
+                  <span className="font-bold">Description :</span>{" "}
                   {props.description}
                 </p>
               </div>
               <button
-                className="btn btn-error mt-10 w-44"
+                className="btn btn-error mt-10 w-44 text-white"
                 onClick={() => deletePost(props.id)}
               >
                 Supprimer
@@ -220,9 +309,25 @@ const Plant: React.FC<
             </div>
           </section>
         </div>
+        {showModal && (
+          <ModalTreshold plant={props} setShowModal={setShowModal} />
+        )}
       </div>
     </Layout>
   );
 };
 
 export default Plant;
+
+async function waterAPlant(id: string) {
+  try {
+    await fetch("/api/waterPlant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(id),
+    });
+    // await Router.push("/plant/" + id);
+  } catch (error) {
+    console.error(error);
+  }
+}
