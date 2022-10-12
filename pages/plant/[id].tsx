@@ -194,7 +194,7 @@ const Plant: React.FC<
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                  <div className="collapse collapse-arrow">
+                  <div className="collapse-arrow collapse">
                     <input type="checkbox" />
                     <div className="collapse-title">
                       💦 Humidité dans l'air :{" "}
