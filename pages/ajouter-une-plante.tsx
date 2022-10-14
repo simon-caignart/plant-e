@@ -149,7 +149,7 @@ const AddAPlant: React.FC = () => {
                     className="btn btn-primary"
                     onClick={() => {
                       setSelectedPlantId(plant.plantId);
-                      setShowModal(true);
+                      setShowModal(true)
                     }}
                   >
                     Choisir
