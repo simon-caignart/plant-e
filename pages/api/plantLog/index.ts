@@ -58,6 +58,16 @@ export default async function handle(req, res) {
     }
   }
 
+  if (!plant.automaticWatering) {
+    if (needToWater) {
+      await sendThirstyNotification(plantLog, plant);
+    }
+  }
+
+  if (plantLog.waterLevelToLow) {
+    await sendWaterLevelLowNotification(plantLog, plant);
+  }
+
   await prisma.plantLog.create({
     data: {
       humidity: plantLog.humidity,
@@ -76,4 +86,68 @@ export default async function handle(req, res) {
     needToWater: needToWater,
     waterQuantity: plant.waterQuantity,
   });
+}
+
+async function sendThirstyNotification(plantLog: PlantLogCreateInput, plant) {
+  const plantUser = await prisma.plant.findUnique({
+    where: {
+      id: plantLog.plantId,
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  if (plantUser) {
+    const body = {
+      to: plantUser.user?.fcmToken,
+      priority: "high",
+      notification: {
+        title: `Votre plante "${plant.name}" a soif ! 💦`,
+      },
+    };
+
+    await fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `key=AAAA0sIWlR0:APA91bEehiyPGieZ4oLt30135luu4U_xg9N_SRMbNre3t0NvAG2-EeJGnGFdG0WwJolnuFcHlRH9Bzz100Ajkdww6h8lUIR-VzVccFjqLqjS10Fg1O1ww2h6J4ZHSld2e6jfjOysN0_x`,
+      },
+      body: JSON.stringify(body),
+    });
+  }
+}
+
+async function sendWaterLevelLowNotification(
+  plantLog: PlantLogCreateInput,
+  plant
+) {
+  const plantUser = await prisma.plant.findUnique({
+    where: {
+      id: plantLog.plantId,
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  if (plantUser) {
+    const body = {
+      to: plantUser.user?.fcmToken,
+      priority: "high",
+      notification: {
+        title: `Le réservoir de votre plante "${plant.name}" est presque vide ⚠️`,
+        body: "Il est temps de le remplir !",
+      },
+    };
+
+    await fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `key=AAAA0sIWlR0:APA91bEehiyPGieZ4oLt30135luu4U_xg9N_SRMbNre3t0NvAG2-EeJGnGFdG0WwJolnuFcHlRH9Bzz100Ajkdww6h8lUIR-VzVccFjqLqjS10Fg1O1ww2h6J4ZHSld2e6jfjOysN0_x`,
+      },
+      body: JSON.stringify(body),
+    });
+  }
 }

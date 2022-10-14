@@ -22,20 +22,19 @@ const PlantCard: React.FC<{
           🪴{" : "}
           {plant.logs && plant.logs.length > 0
             ? `${plant.logs.at(0).soilMoisture} %`
-            : "N/A"}
+            : "Aucune valeur"}
         </p>
         <p className="text-lg">
           💡{" : "}
           {plant.logs && plant.logs.length > 0
             ? `${plant.logs.at(0).luminosity} %`
-            : "N/A"}
+            : "Aucune valeur"}
         </p>
         <div className="flex-1" />
         <p className="font-mono text-sm text-gray-500">
-          Mis à jour{" "}
           {plant.logs && plant.logs.length > 0
-            ? fromDate(new Date(plant.logs.at(0).createdAt))
-            : "N/A"}
+            ? `Mis à jour ${fromDate(new Date(plant.logs.at(0).createdAt))}`
+            : ""}
         </p>
       </section>
     </div>

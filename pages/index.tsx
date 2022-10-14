@@ -58,7 +58,7 @@ const Dashboard: React.FC<Props> = (props) => {
         className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
         style={{ backgroundImage: "url(/wave.svg)" }}
       >
-        <h1 className="mb-10 text-3xl text-white md:text-4xl xl:text-5xl">
+        <h1 className="mb-10 pt-5 text-3xl text-white md:text-4xl xl:text-5xl">
           Mon jardin
         </h1>
         <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">

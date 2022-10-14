@@ -8,8 +8,7 @@
     "generate": "npx prisma generate",
     "lint": "next lint"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Simon et l'autre",
   "license": "MIT",
   "dependencies": {
     "@heroicons/react": "^2.0.11",
@@ -17,11 +16,14 @@
     "@prisma/client": "3.9.1",
     "chart.js": "^3.9.1",
     "daisyui": "^2.31.0",
+    "firebase": "^9.12.1",
+    "localforage": "^1.10.0",
     "next": "12.0.10",
     "next-auth": "4.1.2",
     "react": "17.0.2",
     "react-chartjs-2": "^4.3.1",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-toastify": "^9.0.8"
   },
   "devDependencies": {
     "@types/node": "17.0.14",

@@ -126,7 +126,7 @@ const AddAPlant: React.FC = () => {
         className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
         style={{ backgroundImage: "url(/wave.svg)" }}
       >
-        <h1 className="mb-10 text-3xl text-white md:text-4xl xl:text-5xl">
+        <h1 className="mb-10 pt-5 text-3xl text-white md:text-4xl xl:text-5xl">
           Ajouter une plante
         </h1>
 

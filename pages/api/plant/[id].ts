@@ -1,31 +1,31 @@
 import prisma from "../../../lib/prisma";
-import { PlantCreateInput } from "../../../types/PlantCreateInput";
+import { PlantUpdateInput } from "../../../types/PlantUpdateInput";
 
-// DELETE /api/plant/:id
+// /api/plant/:id
 export default async function handle(req, res) {
   const plantId = req.query.id;
-  const plantCreateInput: PlantCreateInput = req.body;
+  const plantUpdateInput: PlantUpdateInput = JSON.parse(req.body);
   if (req.method === "DELETE") {
-    const post = await prisma.plant.delete({
+    const plant = await prisma.plant.delete({
       where: { id: plantId },
     });
-    res.json(post);
+    res.json(plant);
   } else if (req.method === "PUT") {
     const update = await prisma.plant.update({
       where: { id: plantId },
       data: {
-        id: plantCreateInput.id,
-        name: plantCreateInput.name,
-        latinName: plantCreateInput.latinName,
-        commonName: plantCreateInput.commonName,
-        image: plantCreateInput.image,
-        description: plantCreateInput.description,
-        wateringFrequency: plantCreateInput.wateringFrequency,
-        waterQuantity: plantCreateInput.waterQuantity,
-        luminosityThreshold: plantCreateInput.luminosityThreshold,
-        temperatureThreshold: plantCreateInput.temperatureThreshold,
-        humidityThreshold: plantCreateInput.humidityThreshold,
-        soilMoistureThreshold: plantCreateInput.soilMoistureThreshold,
+        name: plantUpdateInput.name,
+        latinName: plantUpdateInput.latinName,
+        commonName: plantUpdateInput.commonName,
+        image: plantUpdateInput.image,
+        description: plantUpdateInput.description,
+        wateringFrequency: plantUpdateInput.wateringFrequency,
+        waterQuantity: plantUpdateInput.waterQuantity,
+        luminosityThreshold: plantUpdateInput.luminosityThreshold,
+        temperatureThreshold: plantUpdateInput.temperatureThreshold,
+        humidityThreshold: plantUpdateInput.humidityThreshold,
+        soilMoistureThreshold: plantUpdateInput.soilMoistureThreshold,
+        automaticWatering: plantUpdateInput.automaticWatering,
       },
     });
     res.json(update);

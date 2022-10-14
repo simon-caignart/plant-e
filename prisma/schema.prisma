@@ -56,6 +56,7 @@ model User {
   image         String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  fcmToken      String?
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
@@ -80,6 +81,7 @@ model Plant {
   commonName            String
   image                 String?
   description           String?
+  automaticWatering     Boolean?   @default(true)
   logs                  PlantLog[]
   wateringFrequency     Int?
   luminosityThreshold   Int?

@@ -8,5 +8,54 @@
 
 .waterAPlant:hover:before {
   content: "💦";
-  font-size: 4rem;
+  font-size: 2rem;
+}
+
+/* react-toastity custom styles */
+:root {
+  --toastify-color-light: hsl(var(--b1));
+  --toastify-color-dark: hsl(var(--b1));
+  --toastify-color-info: hsl(var(--in));
+  --toastify-color-success: hsl(var(--su));
+  --toastify-color-warning: hsl(var(--wa));
+  --toastify-color-error: hsl(var(--er));
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7);
+
+  --toastify-icon-color-info: var(--toastify-color-info);
+  --toastify-icon-color-success: var(--toastify-color-success);
+  --toastify-icon-color-warning: var(--toastify-color-warning);
+  --toastify-icon-color-error: var(--toastify-color-error);
+
+  --toastify-toast-width: 320px;
+  --toastify-toast-background: hsl(var(--b2));
+  --toastify-toast-min-height: 64px;
+  --toastify-toast-max-height: 800px;
+  --toastify-font-family: sans-serif;
+  --toastify-z-index: 9999;
+
+  --toastify-text-color-light: hsl(var(--bc));
+  --toastify-text-color-dark: hsl(var(--bc));
+
+  --toastify-text-color-info: hsl(var(--bc));
+  --toastify-text-color-success: hsl(var(--bc));
+  --toastify-text-color-warning: hsl(var(--bc));
+  --toastify-text-color-error: hsl(var(--bc));
+
+  --toastify-spinner-color: hsl(var(--b3));
+  --toastify-spinner-color-empty-area: hsl(var(--bc));
+
+  --toastify-color-progress-light: hsl(var(--p));
+  --toastify-color-progress-dark: hsl(var(--p));
+  --toastify-color-progress-info: var(--toastify-color-info);
+  --toastify-color-progress-success: var(--toastify-color-success);
+  --toastify-color-progress-warning: var(--toastify-color-warning);
+  --toastify-color-progress-error: var(--toastify-color-error);
+}
+
+.Toastify__toast {
+  border-radius: var(--rounded-box);
+}
+
+.Toastify__close-button {
+  color: hsl(var(--bc));
 }

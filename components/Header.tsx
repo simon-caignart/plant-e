@@ -1,4 +1,7 @@
-import { ArrowLeftOnRectangleIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftOnRectangleIcon,
+  ArrowSmallLeftIcon,
+} from "@heroicons/react/24/solid";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -84,10 +87,10 @@ const Header: React.FC = () => {
         <>
           {showHeader && (
             <button
-              className="btn btn-error w-44 text-white shadow-lg"
+              className="btn btn-ghost text-xl normal-case text-white"
               onClick={() => router.back()}
             >
-              ⇦ Retour
+              <ArrowSmallLeftIcon className="mr-1 h-8 w-8 stroke-2" /> Retour
             </button>
           )}
 

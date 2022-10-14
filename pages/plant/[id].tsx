@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Plant, PlantLog } from "@prisma/client";
 import {
   CategoryScale,
@@ -20,6 +21,7 @@ import { ModalTreshold } from "../../components/modalTreshold";
 import { SignIn } from "../../components/SignIn";
 import { fromDate } from "../../functions/localTimeString";
 import prisma from "../../lib/prisma";
+import { PlantUpdateInput } from "../../types/PlantUpdateInput";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const plant = await prisma.plant.findUnique({
@@ -49,11 +51,23 @@ const Plant: React.FC<
   const { data: session } = useSession();
 
   const [showModal, setShowModal] = useState(false);
-  async function deletePost(id: string): Promise<void> {
+  async function deletePlant(id: string): Promise<void> {
     await fetch(`/api/plant/${id}`, {
       method: "DELETE",
     });
     Router.push("/");
+  }
+
+  async function updateAutomaticWatering(id: string): Promise<void> {
+    const plantUpdateInput: PlantUpdateInput = {
+      automaticWatering: !props.automaticWatering,
+    };
+
+    await fetch(`/api/plant/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(plantUpdateInput),
+    });
+    Router.push(`/plant/${id}`);
   }
 
   ChartJS.register(
@@ -149,15 +163,14 @@ const Plant: React.FC<
         className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
         style={{ backgroundImage: "url(/wave.svg)" }}
       >
-        <h2 className="plantTitle mb-10 text-5xl font-bold text-white xl:mb-0">
-          {props.name}
-        </h2>
+        <h2 className="mb-10 pt-5 text-5xl text-white xl:mb-0">{props.name}</h2>
 
         <div className="grid justify-center xl:grid-cols-[30%_70%]">
           <section>
             <img
               className="order-1 mt-16 max-w-sm p-12 xl:order-none"
               src={props.image}
+              alt={props.commonName}
             />
             {/* <h2 className="mb-4 mt-10 text-2xl text-white">
               🗒️ Notes
@@ -171,24 +184,40 @@ const Plant: React.FC<
             </h2> */}
           </section>
 
-          <section>
-            <div className="flex items-center justify-center">
-              <button
-                className="waterAPlant btn btn-accent flex h-32 w-60 items-center justify-center rounded-3xl text-xl font-bold text-white shadow-lg"
-                onClick={() => waterAPlant(props.id)}
-              >
-                <span>Arroser la plante</span>
-              </button>
-            </div>
-
+          <section className="mt-5">
             <div className="flex flex-col gap-1">
-              <h2 className="mb-4 text-2xl text-white">
-                📈 Statistiques de votre plante{" "}
+              <h2 className="mb-4 text-2xl text-white">⚡ Actions Rapides</h2>
+
+              <div className="flex items-center gap-4">
+                <button
+                  className="waterAPlant btn btn-accent flex w-56 items-center justify-center text-white shadow-lg"
+                  onClick={() => waterAPlant(props.id)}
+                >
+                  <span>Arroser la plante</span>
+                </button>
+                <button
+                  onClick={() => updateAutomaticWatering(props.id)}
+                  className="btn btn-ghost bg-fuchsia-500 text-white shadow-lg hover:bg-fuchsia-600"
+                >
+                  Arrosage automatique :{" "}
+                  {props.automaticWatering ? "Activé" : "Désactivé"}
+                </button>
+                <button
+                  className="btn btn-error w-44 text-white shadow-lg hover:bg-red-600"
+                  onClick={() => deletePlant(props.id)}
+                >
+                  Supprimer
+                </button>
+              </div>
+
+              <h2 className="mb-4 mt-10 text-2xl text-white">
+                📈 Statistiques{" "}
                 <span className="ml-2 font-mono text-sm text-gray-100">
-                  Mis à jour{" "}
                   {props.logs && props.logs.length > 0
-                    ? fromDate(new Date(props.logs.at(0).createdAt))
-                    : "N/A"}
+                    ? `Mis à jour ${fromDate(
+                        new Date(props.logs.at(0).createdAt)
+                      )}`
+                    : ""}
                 </span>
               </h2>
 
@@ -200,7 +229,7 @@ const Plant: React.FC<
                       💦 Humidité dans l'air :{" "}
                       {props.logs && props.logs.length > 0
                         ? `${props.logs.at(0).humidity} %`
-                        : "N/A"}{" "}
+                        : "Aucune valeur"}{" "}
                     </div>
                     <div className="collapse-content">
                       <Line options={options} data={humidityData} />
@@ -215,7 +244,7 @@ const Plant: React.FC<
                       🪴 Humidité dans le sol :{" "}
                       {props.logs && props.logs.length > 0
                         ? `${props.logs.at(0).soilMoisture} %`
-                        : "N/A"}
+                        : "Aucune valeur"}
                     </div>
                     <div className="collapse-content">
                       <Line options={options} data={soilMoistureData} />
@@ -230,7 +259,7 @@ const Plant: React.FC<
                       💡 Luminosité:{" "}
                       {props.logs && props.logs.length > 0
                         ? `${props.logs.at(0).luminosity} %`
-                        : "N/A"}
+                        : "Aucune valeur"}
                     </div>
                     <div className="collapse-content">
                       <Line options={options} data={luminosityData} />
@@ -246,7 +275,7 @@ const Plant: React.FC<
                       <span className="text-gray-600">
                         {props.logs && props.logs.length > 0
                           ? `${props.logs.at(0).temperature} °C`
-                          : "N/A"}
+                          : "Aucune valeur"}
                       </span>
                     </div>
                     <div className="collapse-content">
@@ -256,7 +285,7 @@ const Plant: React.FC<
                 </div>
               </div>
               <h2 className="mb-4 mt-10 text-2xl text-white">
-                🤖 Seuils pour arrosage automatique{" "}
+                🤖 Arrosage automatique{" "}
                 <button
                   onClick={() => {
                     setShowModal(true);
@@ -272,15 +301,17 @@ const Plant: React.FC<
                     <p>
                       {props.wateringFrequency == null
                         ? "Aucune Valeur"
-                        : props.wateringFrequency}
+                        : `Tous les ${props.wateringFrequency} jours`}
                     </p>
                   </div>
                   <div>
-                    <span className="font-bold">Quantité d'arrosage :</span>
+                    <span className="font-bold">
+                      Quantité d'eau par arrosage :
+                    </span>
                     <p>
                       {props.waterQuantity == null
                         ? "Aucune Valeur"
-                        : props.waterQuantity}
+                        : `${props.waterQuantity} ml`}
                     </p>
                   </div>
                   <div>
@@ -290,7 +321,7 @@ const Plant: React.FC<
                     <p>
                       {props.soilMoistureThreshold == 0
                         ? "Aucune Valeur"
-                        : props.soilMoistureThreshold}
+                        : `${props.soilMoistureThreshold} %`}
                     </p>
                   </div>
                   <div>
@@ -300,7 +331,7 @@ const Plant: React.FC<
                     <p>
                       {props.humidityThreshold == 0
                         ? "Aucune Valeur"
-                        : props.humidityThreshold}
+                        : `${props.humidityThreshold} %`}
                     </p>
                   </div>
                   <div>
@@ -310,7 +341,7 @@ const Plant: React.FC<
                     <p>
                       {props.temperatureThreshold == 0
                         ? "Aucune Valeur"
-                        : props.temperatureThreshold}
+                        : `${props.temperatureThreshold} °C`}
                     </p>
                   </div>
                   <div>
@@ -318,7 +349,7 @@ const Plant: React.FC<
                     <p>
                       {props.luminosityThreshold == 0
                         ? "Aucune Valeur"
-                        : props.luminosityThreshold}
+                        : `${props.luminosityThreshold} %`}
                     </p>
                   </div>
                 </div>
@@ -341,12 +372,6 @@ const Plant: React.FC<
                   {props.description}
                 </p>
               </div>
-              <button
-                className="btn btn-error mt-10 w-44 text-white"
-                onClick={() => deletePost(props.id)}
-              >
-                Supprimer
-              </button>
             </div>
           </section>
         </div>
@@ -367,7 +392,6 @@ async function waterAPlant(id: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(id),
     });
-    // await Router.push("/plant/" + id);
   } catch (error) {
     console.error(error);
   }
