@@ -19,6 +19,7 @@ import { Line } from "react-chartjs-2";
 import Layout from "../../components/Layout";
 import { ModalTreshold } from "../../components/modalTreshold";
 import { SignIn } from "../../components/SignIn";
+import { capitalizeFirstLetter } from "../../functions/capitalizeFirstLetter";
 import { fromDate } from "../../functions/localTimeString";
 import prisma from "../../lib/prisma";
 import { PlantUpdateInput } from "../../types/PlantUpdateInput";
@@ -239,14 +240,16 @@ const Plant: React.FC<
                 <div className="collapse-title">
                   🚰  Dernier arrosage :{" "}
                   {props.logs && props.logs.length > 0
-                    ? fromDate(
-                        new Date(
-                          new Array(...props.logs)
-                            .reverse()
-                            .find((log) => log.wasWatered).createdAt
+                    ? capitalizeFirstLetter(
+                        fromDate(
+                          new Date(
+                            new Array(...props.logs)
+                              .reverse()
+                              .find((log) => log.wasWatered).createdAt
+                          )
                         )
                       )
-                    : "Aucune valeur"}{" "}
+                    : "Aucune valeur"}
                 </div>
               </div>
 
@@ -257,7 +260,7 @@ const Plant: React.FC<
               </div>
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                <div className="collapse-arrow collapse">
+                <div className="collapse collapse-arrow">
                   <input
                     type="checkbox"
                     id="collapse-humidity"
@@ -282,7 +285,7 @@ const Plant: React.FC<
               </div>
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                <div className="collapse-arrow collapse">
+                <div className="collapse collapse-arrow">
                   <input
                     type="checkbox"
                     id="collapse-soilMoisture"
@@ -307,7 +310,7 @@ const Plant: React.FC<
               </div>
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                <div className="collapse-arrow collapse">
+                <div className="collapse collapse-arrow">
                   <input
                     type="checkbox"
                     id="collapse-luminosity"
@@ -332,7 +335,7 @@ const Plant: React.FC<
               </div>
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
-                <div className="collapse-arrow collapse">
+                <div className="collapse collapse-arrow">
                   <input
                     type="checkbox"
                     id="collapse-temperature"
