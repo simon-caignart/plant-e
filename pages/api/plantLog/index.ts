@@ -1,3 +1,4 @@
+import { Plant } from "@prisma/client";
 import prisma from "../../../lib/prisma";
 import { PlantLogCreateInput } from "./../../../types/PlantLogCreateInput";
 
@@ -58,6 +59,7 @@ export default async function handle(req, res) {
     }
   }
 
+  // Send thirsty notification if the automatic watering system is not enabled
   if (!plant.automaticWatering) {
     if (needToWater) {
       await sendThirstyNotification(plantLog, plant);
@@ -83,7 +85,8 @@ export default async function handle(req, res) {
 
   res.json({
     message: "Plant log created",
-    needToWater: needToWater,
+    // needToWater always false if automatic watering is disabled
+    needToWater: plant.automaticWatering ? needToWater : false,
     waterQuantity: plant.waterQuantity,
   });
 }
@@ -120,7 +123,7 @@ async function sendThirstyNotification(plantLog: PlantLogCreateInput, plant) {
 
 async function sendWaterLevelLowNotification(
   plantLog: PlantLogCreateInput,
-  plant
+  plant: Plant
 ) {
   const plantUser = await prisma.plant.findUnique({
     where: {
