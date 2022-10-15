@@ -1,85 +1,18 @@
+/* eslint-disable @next/next/no-img-element */
 import {
   ArrowLeftOnRectangleIcon,
   ArrowSmallLeftIcon,
 } from "@heroicons/react/24/solid";
 import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
 const Header: React.FC = () => {
   const router = useRouter();
-  const isActive: (pathname: string) => boolean = (pathname) =>
-    router.pathname === pathname;
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const showHeader = router.pathname === "/" ? false : true;
-
-  let left = (
-    <div className="left">
-      <Link href="/">
-        <a className="bold" data-active={isActive("/")}>
-          Feed
-        </a>
-      </Link>
-    </div>
-  );
-
-  let right = null;
-
-  if (status === "loading") {
-    left = (
-      <div className="left">
-        <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
-            Feed
-          </a>
-        </Link>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>Validating session ...</p>
-      </div>
-    );
-  }
-
-  if (!session) {
-    right = (
-      <div className="right">
-        <Link href="/api/auth/signin">
-          <a data-active={isActive("/signup")}>Log in</a>
-        </Link>
-      </div>
-    );
-  }
-
-  if (session) {
-    left = (
-      <div className="left">
-        <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
-            Feed
-          </a>
-        </Link>
-        <Link href="/drafts">
-          <a data-active={isActive("/drafts")}>My drafts</a>
-        </Link>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>
-          {session.user.name} ({session.user.email})
-        </p>
-        <img src={session.user.image} className="rounded-full" />
-        <button onClick={() => signOut()}>
-          <a>Log out</a>
-        </button>
-      </div>
-    );
-  }
 
   return (
     <nav className="sticky top-0 left-0 right-0 z-50 flex items-center bg-plant-green p-2">
@@ -88,7 +21,7 @@ const Header: React.FC = () => {
           {showHeader && (
             <button
               className="btn btn-ghost text-xl normal-case text-white"
-              onClick={() => router.back()}
+              onClick={() => router.push("/")}
             >
               <ArrowSmallLeftIcon className="mr-1 h-8 w-8 stroke-2" /> Retour
             </button>
@@ -107,6 +40,7 @@ const Header: React.FC = () => {
             width={45}
             src={session.user.image}
             className="rounded-full bg-white"
+            alt="user profile picture"
           />
         </>
       )}

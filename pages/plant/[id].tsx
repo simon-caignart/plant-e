@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     include: {
       logs: {
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
         take: 480,
       },
@@ -83,6 +83,15 @@ const Plant: React.FC<
 
   const options = {
     responsive: true,
+    scales: {
+      y: {
+        min: 0,
+        max: 100,
+        ticks: {
+          stepSize: 10,
+        },
+      },
+    },
     plugins: {
       legend: {
         display: false,
@@ -94,9 +103,12 @@ const Plant: React.FC<
     },
   };
 
-  // const labels = ["January", "February", "March", "April", "May", "June", "July"];
+  const labels = props.logs.map((log) =>
+    new Date(log.createdAt).toTimeString().slice(0, 5)
+  );
 
   const luminosityData = {
+    labels,
     datasets: [
       {
         fill: true,
@@ -111,7 +123,7 @@ const Plant: React.FC<
   };
 
   const soilMoistureData = {
-    // labels,
+    labels,
     datasets: [
       {
         fill: true,
@@ -126,6 +138,7 @@ const Plant: React.FC<
   };
 
   const humidityData = {
+    labels,
     datasets: [
       {
         fill: true,
@@ -140,6 +153,7 @@ const Plant: React.FC<
   };
 
   const temperatureData = {
+    labels,
     datasets: [
       {
         fill: true,
@@ -168,7 +182,7 @@ const Plant: React.FC<
         <div className="grid justify-center xl:grid-cols-[30%_70%]">
           <section className="grid xl:mt-16">
             <img
-              className="xl:order-0 order-1 w-1/2 max-w-sm justify-self-center xl:m-12 xl:w-full"
+              className="xl:order-0 order-1 w-1/2 max-w-[14rem] justify-self-center xl:m-12 xl:w-full xl:max-w-[19rem]"
               src={props.image}
               alt={props.commonName}
             />
@@ -184,8 +198,8 @@ const Plant: React.FC<
             </h2> */}
           </section>
 
-          <section className="mx-5 mt-5 flex flex-col gap-1">
-            <h2 className="mb-4 text-2xl text-white">⚡ Actions Rapides</h2>
+          <section className=" mt-5 flex flex-col gap-1">
+            <h2 className="mb-4 text-2xl text-white">⚡  Actions Rapides</h2>
 
             <div className="flex flex-wrap items-center gap-4">
               <button
@@ -210,11 +224,11 @@ const Plant: React.FC<
             </div>
 
             <h2 className="mb-4 mt-10 text-2xl text-white">
-              📈 Statistiques{" "}
+              📈  Statistiques{" "}
               <span className="ml-2 font-mono text-sm text-gray-100">
                 {props.logs && props.logs.length > 0
                   ? `Mis à jour ${fromDate(
-                      new Date(props.logs.at(0).createdAt)
+                      new Date(props.logs.at(-1).createdAt)
                     )}`
                   : ""}
               </span>
@@ -222,12 +236,43 @@ const Plant: React.FC<
 
             <div className="grid gap-6 md:grid-cols-2">
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                <div className="collapse-title">
+                  🚰  Dernier arrosage :{" "}
+                  {props.logs && props.logs.length > 0
+                    ? fromDate(
+                        new Date(
+                          new Array(...props.logs)
+                            .reverse()
+                            .find((log) => log.wasWatered).createdAt
+                        )
+                      )
+                    : "Aucune valeur"}{" "}
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
+                <div className="collapse-title">
+                  🫥  JE SAIS PAS QUOI METTRE ICI
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-arrow collapse">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    id="collapse-humidity"
+                    onChange={(e) => {
+                      const element = document.getElementById(
+                        "collapse-soilMoisture"
+                      ) as HTMLInputElement;
+
+                      element.checked = e.target.checked;
+                    }}
+                  />
                   <div className="collapse-title">
-                    💦 Humidité dans l'air :{" "}
+                    💦  Humidité dans l'air :{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).humidity} %`
+                      ? `${props.logs.at(-1).humidity} %`
                       : "Aucune valeur"}{" "}
                   </div>
                   <div className="collapse-content">
@@ -238,11 +283,21 @@ const Plant: React.FC<
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-arrow collapse">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    id="collapse-soilMoisture"
+                    onChange={(e) => {
+                      const element = document.getElementById(
+                        "collapse-humidity"
+                      ) as HTMLInputElement;
+
+                      element.checked = e.target.checked;
+                    }}
+                  />
                   <div className="collapse-title">
-                    🪴 Humidité dans le sol :{" "}
+                    🪴  Humidité dans le sol :{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).soilMoisture} %`
+                      ? `${props.logs.at(-1).soilMoisture} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -253,11 +308,21 @@ const Plant: React.FC<
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-arrow collapse">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    id="collapse-luminosity"
+                    onChange={(e) => {
+                      const element = document.getElementById(
+                        "collapse-temperature"
+                      ) as HTMLInputElement;
+
+                      element.checked = e.target.checked;
+                    }}
+                  />
                   <div className="collapse-title">
-                    💡 Luminosité:{" "}
+                    💡  Luminosité:{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).luminosity} %`
+                      ? `${props.logs.at(-1).luminosity} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -268,12 +333,22 @@ const Plant: React.FC<
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-arrow collapse">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    id="collapse-temperature"
+                    onChange={(e) => {
+                      const element = document.getElementById(
+                        "collapse-luminosity"
+                      ) as HTMLInputElement;
+
+                      element.checked = e.target.checked;
+                    }}
+                  />
                   <div className="collapse-title">
-                    🌡️ Température:{" "}
+                    🌡️  Température:{" "}
                     <span className="text-gray-600">
                       {props.logs && props.logs.length > 0
-                        ? `${props.logs.at(0).temperature} °C`
+                        ? `${props.logs.at(-1).temperature} °C`
                         : "Aucune valeur"}
                     </span>
                   </div>
@@ -284,7 +359,7 @@ const Plant: React.FC<
               </div>
             </div>
             <h2 className="mb-4 mt-10 text-2xl text-white">
-              🤖 Arrosage automatique{" "}
+              🤖  Arrosage automatique{" "}
               <button
                 onClick={() => {
                   setShowModal(true);
@@ -354,7 +429,7 @@ const Plant: React.FC<
               </div>
             </div>
             <h2 className="mb-4 mt-10 text-2xl text-white">
-              ℹ️ Informations sur votre plante
+              ℹ️  Informations sur votre plante
             </h2>
 
             <div className="rounded-xl bg-white p-4 shadow-xl">

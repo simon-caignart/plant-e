@@ -6,10 +6,10 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = (props) => (
-  <div className="bg-white">
+  <main className="bg-white">
     <Header />
     <div>{props.children}</div>
-  </div>
+  </main>
 );
 
 export default Layout;
