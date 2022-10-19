@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     include: {
       logs: {
         orderBy: {
-          createdAt: "asc",
+          createdAt: "desc",
         },
         take: 480,
       },
@@ -114,9 +114,12 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Luminosité",
-        data: props.logs.map((log) => {
-          return log.luminosity;
-        }),
+        data: props.logs
+          .slice()
+          .reverse()
+          .map((log) => {
+            return log.luminosity;
+          }),
         borderColor: "rgba(255, 222, 105, 0.5)",
         backgroundColor: "rgba(254, 242, 205, 0.6)",
       },
@@ -129,9 +132,12 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Humidité du sol",
-        data: props.logs.map((log) => {
-          return log.soilMoisture;
-        }),
+        data: props.logs
+          .slice()
+          .reverse()
+          .map((log) => {
+            return log.soilMoisture;
+          }),
         borderColor: "rgba(255, 148, 62, 0.3)",
         backgroundColor: "rgba(92, 159, 27, 0.4)",
       },
@@ -144,9 +150,12 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Humidité",
-        data: props.logs.map((log) => {
-          return log.humidity;
-        }),
+        data: props.logs
+          .slice()
+          .reverse()
+          .map((log) => {
+            return log.humidity;
+          }),
         borderColor: "rgba(0, 168, 243, 0.3)",
         backgroundColor: "rgba(127, 237, 254, 0.3)",
       },
@@ -159,9 +168,12 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Temperature",
-        data: props.logs.map((log) => {
-          return log.temperature;
-        }),
+        data: props.logs
+          .slice()
+          .reverse()
+          .map((log) => {
+            return log.temperature;
+          }),
         borderColor: "rgba(205, 32, 38, 0.3)",
         backgroundColor: "rgba(255, 43, 58, 0.3)",
       },
@@ -187,16 +199,6 @@ const Plant: React.FC<
               src={props.image}
               alt={props.commonName}
             />
-            {/* <h2 className="mb-4 mt-10 text-2xl text-white">
-              🗒️ Notes
-              <button
-                onClick={() => {
-                  setShowModal(true);
-                }}
-              >
-                ✏️
-              </button>
-            </h2> */}
           </section>
 
           <section className=" mt-5 flex flex-col gap-1">
@@ -229,7 +231,7 @@ const Plant: React.FC<
               <span className="ml-2 font-mono text-sm text-gray-100">
                 {props.logs && props.logs.length > 0
                   ? `Mis à jour ${fromDate(
-                      new Date(props.logs.at(-1).createdAt)
+                      new Date(props.logs.at(0).createdAt)
                     )}`
                   : ""}
               </span>
@@ -243,9 +245,9 @@ const Plant: React.FC<
                     ? capitalizeFirstLetter(
                         fromDate(
                           new Date(
-                            new Array(...props.logs)
-                              .reverse()
-                              .find((log) => log.wasWatered).createdAt
+                            new Array(...props.logs).find(
+                              (log) => log.wasWatered
+                            ).createdAt
                           )
                         )
                       )
@@ -275,7 +277,7 @@ const Plant: React.FC<
                   <div className="collapse-title">
                     💦  Humidité dans l'air :{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(-1).humidity} %`
+                      ? `${props.logs.at(0).humidity} %`
                       : "Aucune valeur"}{" "}
                   </div>
                   <div className="collapse-content">
@@ -300,7 +302,7 @@ const Plant: React.FC<
                   <div className="collapse-title">
                     🪴  Humidité dans le sol :{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(-1).soilMoisture} %`
+                      ? `${props.logs.at(0).soilMoisture} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -325,7 +327,7 @@ const Plant: React.FC<
                   <div className="collapse-title">
                     💡  Luminosité:{" "}
                     {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(-1).luminosity} %`
+                      ? `${props.logs.at(0).luminosity} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -351,7 +353,7 @@ const Plant: React.FC<
                     🌡️  Température:{" "}
                     <span className="text-gray-600">
                       {props.logs && props.logs.length > 0
-                        ? `${props.logs.at(-1).temperature} °C`
+                        ? `${props.logs.at(0).temperature} °C`
                         : "Aucune valeur"}
                     </span>
                   </div>

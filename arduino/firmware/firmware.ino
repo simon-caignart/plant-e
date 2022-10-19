@@ -21,22 +21,22 @@ HttpClient client = HttpClient( wifi, serverName, port );
 StaticJsonDocument<128> jsonDoc;
 
 // WATER LEVEL SENSOR CONFIG
-#define POWER_PIN_WATER_LEVEL_SENSOR  9
-#define SIGNAL_PIN_WATER_LEVEL_SENSOR A0
+#define POWER_PIN_WATER_LEVEL_SENSOR  6
+#define SIGNAL_PIN_WATER_LEVEL_SENSOR A4
 int waterLevelValue = 0;
 String waterLevelToLow = "false";
 
 // SOIL MOISTURE SENSOR CONFIG
-#define POWER_PIN_SOIL_MOISTURE_SENSOR 8
-#define SIGNAL_PIN_SOIL_MOISTURE_SENSOR A1
+#define POWER_PIN_SOIL_MOISTURE_SENSOR 9
+#define SIGNAL_PIN_SOIL_MOISTURE_SENSOR A0
 const int dryValue = 680;  
 const int wetValue = 340;
 int soilMoistureValue = 0;
 int soilMoisturePercent = 0;
 
 // LUMINOSITY SENSOR CONFIG
-#define POWER_PIN_LIGHT_SENSOR 6
-#define SIGNAL_PIN_LIGHT_SENSOR A2
+#define POWER_PIN_LIGHT_SENSOR 8
+#define SIGNAL_PIN_LIGHT_SENSOR A1
 int luminosityValue = 0;
 int luminosityPercent = 0;
 const int highLuminosityValue = 1000;  
@@ -44,13 +44,18 @@ const int lowLuminosityValue = 0;
 
 // HUMIDITY & TEMPERATURE SENSOR CONFIG
 #include "DHT.h"
-#define DHTPIN 7
+
+#define DHTPIN 3
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 
+// WATER PUMP
+#define POWER_PIN_WATER_PUMP 2
+int wateringTime = 0;
+
 void setup() {
-  Serial.begin(9600);
-  while (!Serial);
+  //Serial.begin(9600);
+  //while (!Serial);
 
   pinMode(POWER_PIN_WATER_LEVEL_SENSOR, OUTPUT);
   digitalWrite(POWER_PIN_WATER_LEVEL_SENSOR, LOW);
@@ -60,6 +65,9 @@ void setup() {
 
   pinMode(POWER_PIN_LIGHT_SENSOR, OUTPUT);
   digitalWrite(SIGNAL_PIN_LIGHT_SENSOR, LOW);
+
+  pinMode(POWER_PIN_WATER_PUMP, OUTPUT);
+  digitalWrite(POWER_PIN_WATER_PUMP, LOW);
 
   dht.begin();
 
@@ -85,16 +93,18 @@ void loop() {
   waterLevelValue = analogRead(SIGNAL_PIN_WATER_LEVEL_SENSOR);
   digitalWrite(POWER_PIN_WATER_LEVEL_SENSOR, LOW);
 
-  if (waterLevelValue <= 100) {
+  if (waterLevelValue <= 150) {
     Serial.print("🥛 Water Level: Empty");
     waterLevelToLow = "true";
-  } else if (waterLevelValue > 100 && waterLevelValue <= 300) {
+  } else if (waterLevelValue > 150 && waterLevelValue <= 170) {
     Serial.print("🥛 Water Level: Low");
     waterLevelToLow = "true";
-  } else if (waterLevelValue > 300 && waterLevelValue <= 330) {
+  } else if (waterLevelValue > 170 && waterLevelValue <= 190) {
     Serial.print("🥛 Water Level: Medium");
-  } else if (waterLevelValue > 330) {
+    waterLevelToLow = "false";
+  } else if (waterLevelValue > 190) {
     Serial.print("🥛 Water Level: High");
+    waterLevelToLow = "false";
   }
 
   Serial.print(" (");
@@ -183,7 +193,15 @@ void loop() {
 
   Serial.println("");
   if(needToWater) {
-    Serial.println("Je dois être arrosé 💦 😏");
+    Serial.println("Watering... 🚰");
+
+    wateringTime = (waterQuantity * 60) / 39;
+
+    digitalWrite(POWER_PIN_WATER_PUMP, HIGH);
+    delay(wateringTime * 1000);
+    digitalWrite(POWER_PIN_WATER_PUMP, LOW);
+  
+    Serial.println("Done watering.");
   } else {
     Serial.println("J'ai pu soif c bon 👍");
   }
