@@ -65,7 +65,7 @@ const Plant: React.FC<
     };
 
     await fetch(`/api/plant/${id}`, {
-      method: "PUT",
+      method: "POST",
       body: JSON.stringify(plantUpdateInput),
     });
     Router.push(`/plant/${id}`);

@@ -3,13 +3,13 @@ import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import Router from "next/router";
 import { useState } from "react";
 import ReactDom from "react-dom";
-import { PlantCreateInput } from "../types/PlantCreateInput";
+import { PlantUpdateInput } from "../types/PlantUpdateInput";
 
 export function ModalTreshold(props: {
-  plant: PlantCreateInput;
+  plant: PlantUpdateInput;
   setShowModal: (arg0: boolean) => void;
 }): JSX.Element {
-  const [form, setForm] = useState<PlantCreateInput>({
+  const [form, setForm] = useState<PlantUpdateInput>({
     id: props.plant.id,
     name: props.plant.name,
     latinName: props.plant.latinName,
@@ -27,7 +27,6 @@ export function ModalTreshold(props: {
   const main = document.getElementById("__next");
 
   if (main) {
-
     // React does *not* create a new div. It renders the children into the node with the "__next" id`.
     // We do this so that the modal is abose other elements and renders properly
     return ReactDom.createPortal(
@@ -209,12 +208,12 @@ export function ModalTreshold(props: {
   }
 }
 
-async function updatePlant(plantCreateInput: PlantCreateInput, props: any) {
+async function updatePlant(plantUpdateInput: PlantUpdateInput, props: any) {
   try {
-    await fetch("/api/plant/"+ props.plant.id, {
+    await fetch("/api/plant/" + props.plant.id, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(plantCreateInput),
+      body: JSON.stringify(plantUpdateInput),
     });
     props.setShowModal(false);
     await Router.push("/plant/" + props.plant.id);
