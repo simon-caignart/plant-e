@@ -17,6 +17,7 @@ import Router from "next/router";
 import { useState } from "react";
 import { Line } from "react-chartjs-2";
 import Layout from "../../components/Layout";
+import { ModalDeletePlant } from "../../components/modalDeletePlant";
 import { ModalTreshold } from "../../components/modalTreshold";
 import { SignIn } from "../../components/SignIn";
 import { capitalizeFirstLetter } from "../../functions/capitalizeFirstLetter";
@@ -50,14 +51,8 @@ const Plant: React.FC<
   }
 > = (props) => {
   const { data: session } = useSession();
-
-  const [showModal, setShowModal] = useState(false);
-  async function deletePlant(id: string): Promise<void> {
-    await fetch(`/api/plant/${id}`, {
-      method: "DELETE",
-    });
-    Router.push("/");
-  }
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   async function updateAutomaticWatering(id: string): Promise<void> {
     const plantUpdateInput: PlantUpdateInput = {
@@ -219,8 +214,8 @@ const Plant: React.FC<
                 {props.automaticWatering ? "Activé" : "Désactivé"}
               </button>
               <button
+                onClick={() => setShowDeleteModal(true)}
                 className="btn btn-error w-44 text-white shadow-lg hover:bg-red-600"
-                onClick={() => deletePlant(props.id)}
               >
                 Supprimer
               </button>
@@ -367,7 +362,7 @@ const Plant: React.FC<
               🤖  Arrosage automatique{" "}
               <button
                 onClick={() => {
-                  setShowModal(true);
+                  setShowEditModal(true);
                 }}
               >
                 ✏️
@@ -452,8 +447,11 @@ const Plant: React.FC<
             </div>
           </section>
         </div>
-        {showModal && (
-          <ModalTreshold plant={props} setShowModal={setShowModal} />
+        {showEditModal && (
+          <ModalTreshold plant={props} setShowModal={setShowEditModal} />
+        )}
+        {showDeleteModal && (
+          <ModalDeletePlant plant={props} setShowModal={setShowDeleteModal} />
         )}
       </div>
     </Layout>
