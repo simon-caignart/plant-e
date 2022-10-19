@@ -52,7 +52,7 @@ export function ModalDeletePlant(props: {
             >
               Annuler
             </button>
-            <button onClick={deletePlant} className="btn btn-error">
+            <button onClick={deletePlant} className="btn btn-error text-white">
               Supprimer
             </button>
           </div>

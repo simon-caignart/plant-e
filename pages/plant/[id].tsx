@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import Router from "next/router";
 import { useState } from "react";
 import { Line } from "react-chartjs-2";
+import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
 import { ModalDeletePlant } from "../../components/modalDeletePlant";
 import { ModalTreshold } from "../../components/modalTreshold";
@@ -252,7 +253,12 @@ const Plant: React.FC<
 
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-title">
-                  🫥  JE SAIS PAS QUOI METTRE ICI
+                  🪣  Réservoir :{" "}
+                  {props.logs &&
+                  props.logs.length > 0 &&
+                  props.logs.at(0).waterLevelToLow
+                    ? "Il est temps de le remplir !"
+                    : "Le réservoir est plein"}
                 </div>
               </div>
 
@@ -467,6 +473,10 @@ async function waterAPlant(id: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(id),
     });
+
+    toast.success(
+      "Un arrosage a été programmé, votre plante sera bientôt arrosé ! 🚰"
+    );
   } catch (error) {
     console.error(error);
   }

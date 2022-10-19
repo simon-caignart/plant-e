@@ -1,6 +1,7 @@
 import { Plant, PlantLog } from "@prisma/client";
 import Router from "next/router";
 import React from "react";
+import { capitalizeFirstLetter } from "../functions/capitalizeFirstLetter";
 import { fromDate } from "../functions/localTimeString";
 
 const PlantCard: React.FC<{
@@ -20,22 +21,21 @@ const PlantCard: React.FC<{
         <h2 className="text-3xl font-bold">{plant.name}</h2>
         <p className="text-lg">
           🪴{" : "}
-          {plant.logs && plant.logs.length > 0
+          {plant.logs && plant.logs.length > 0 && plant.logs[0] != null
             ? `${plant.logs.at(0).soilMoisture} %`
             : "Aucune valeur"}
         </p>
         <p className="text-lg">
-          💡{" : "}
-          {plant.logs && plant.logs.length > 0
-            ? `${plant.logs.at(0).luminosity} %`
+          🚰{" : "}{" "}
+          {plant.logs && plant.logs.length > 0 && plant.logs[0] != null
+            ? capitalizeFirstLetter(
+                fromDate(
+                  new Date(plant.logs.find((log) => log.wasWatered).createdAt)
+                )
+              )
             : "Aucune valeur"}
         </p>
         <div className="flex-1" />
-        <p className="font-mono text-sm text-gray-500">
-          {plant.logs && plant.logs.length > 0
-            ? `Mis à jour ${fromDate(new Date(plant.logs.at(0).createdAt))}`
-            : ""}
-        </p>
       </section>
     </div>
   );

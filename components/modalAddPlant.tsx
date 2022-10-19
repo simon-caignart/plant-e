@@ -57,9 +57,7 @@ export function ModalAddPlant(props: {
           >
             <div className="form-control w-full">
               <label className="label" htmlFor="name">
-                <span className="label-text">
-                  Identifiant de votre arroseur 2000
-                </span>
+                <span className="label-text">Identifiant de votre plant-e</span>
               </label>
               <input
                 type="text"

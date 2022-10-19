@@ -23,7 +23,6 @@ function PushNotificationLayout({ children }) {
       try {
         const token = await getFCMToken();
         if (token) {
-          console.log("token", token);
           getMessage();
         }
       } catch (error) {

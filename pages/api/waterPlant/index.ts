@@ -35,6 +35,7 @@ export default async function handle(req, res) {
       data: {
         ...lastPlantLog,
         needToWater: true,
+        id: undefined,
       },
     });
   }

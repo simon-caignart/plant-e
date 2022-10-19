@@ -34,8 +34,42 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       },
     },
   });
+
+  const userLastWateredLog = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+    include: {
+      plants: {
+        include: {
+          logs: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+            where: {
+              wasWatered: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // merge plants and logs
+  const plants = user.plants.map((plant) => {
+    const lastLog = plant.logs.at(0);
+    const lastWateredLog = userLastWateredLog.plants
+      .find((p) => p.id === plant.id)
+      .logs.at(0);
+    return {
+      ...plant,
+      logs: [lastLog, lastWateredLog],
+    };
+  });
+
   return {
-    props: { plants: JSON.parse(JSON.stringify(user.plants)) },
+    props: { plants: JSON.parse(JSON.stringify(plants)) },
   };
 };
 
