@@ -25,7 +25,8 @@ import { capitalizeFirstLetter } from "../../functions/capitalizeFirstLetter";
 import { fromDate } from "../../functions/localTimeString";
 import { PlantUpdateInput } from "../../types/PlantUpdateInput";
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (args: RequestInfo | URL) =>
+  fetch(args).then((res) => res.json());
 
 const Plant: React.FC = () => {
   const router = useRouter();
