@@ -27,6 +27,10 @@ Plant-e is an application and a prototype of an automatic plant watering system.
   yarn dev
 ```
 
+### Arduino Code
+
+You can find the arduino code of the prototype in the `arduino` folder.
+
 
 ## Screenshots of the app
 
