@@ -183,8 +183,7 @@ const Plant: React.FC<
   return (
     <Layout>
       <div
-        className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10"
-        style={{ backgroundImage: "url(/wave.svg)" }}
+        className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10 bg-plant-green"
       >
         <h2 className="mb-10 pt-5 text-5xl text-white xl:mb-0">{props.name}</h2>
 
