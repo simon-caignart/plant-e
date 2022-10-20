@@ -61,13 +61,53 @@ export default async function handle(req, res) {
 
   // Send thirsty notification if the automatic watering system is not enabled
   if (!plant.automaticWatering) {
-    if (needToWater) {
+    // Reset the thirstyNotificationSent flags
+    if (!needToWater && plant.thirstyNotificationSent) {
+      await prisma.plant.update({
+        where: {
+          id: plantLog.plantId,
+        },
+        data: {
+          thirstyNotificationSent: false,
+        },
+      });
+    }
+
+    if (needToWater && !plant.thirstyNotificationSent) {
       await sendThirstyNotification(plantLog, plant);
+      await prisma.plant.update({
+        where: {
+          id: plantLog.plantId,
+        },
+        data: {
+          thirstyNotificationSent: true,
+        },
+      });
     }
   }
 
-  if (plantLog.waterLevelToLow) {
+  // Reset waterLevelToLowNotificationSent flag
+  if (!plantLog.waterLevelToLow && plant.waterLevelToLowNotificationSent) {
+    await prisma.plant.update({
+      where: {
+        id: plantLog.plantId,
+      },
+      data: {
+        waterLevelToLowNotificationSent: false,
+      },
+    });
+  }
+
+  if (plantLog.waterLevelToLow && !plant.waterLevelToLowNotificationSent) {
     await sendWaterLevelLowNotification(plantLog, plant);
+    await prisma.plant.update({
+      where: {
+        id: plantLog.plantId,
+      },
+      data: {
+        waterLevelToLowNotificationSent: true,
+      },
+    });
   }
 
   await prisma.plantLog.create({

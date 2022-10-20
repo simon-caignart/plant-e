@@ -52,6 +52,22 @@ export default async function handle(req, res) {
       },
     });
     res.json(update);
+  } else if (req.method === "GET") {
+    const plant = await prisma.plant.findUnique({
+      where: {
+        id: plantId,
+      },
+      include: {
+        logs: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 480,
+        },
+      },
+    });
+
+    res.json(plant)
   } else {
     throw new Error(
       `The HTTP ${req.method} method is not supported at this route.`

@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { Plant, PlantLog } from "@prisma/client";
+import { Plant } from "@prisma/client";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -11,60 +11,61 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
-import Router from "next/router";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { toast } from "react-toastify";
+import useSWR from "swr";
 import Layout from "../../components/Layout";
 import { ModalDeletePlant } from "../../components/modalDeletePlant";
 import { ModalTreshold } from "../../components/modalTreshold";
 import { SignIn } from "../../components/SignIn";
 import { capitalizeFirstLetter } from "../../functions/capitalizeFirstLetter";
 import { fromDate } from "../../functions/localTimeString";
-import prisma from "../../lib/prisma";
 import { PlantUpdateInput } from "../../types/PlantUpdateInput";
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const plant = await prisma.plant.findUnique({
-    where: {
-      id: String(params?.id),
-    },
-    include: {
-      logs: {
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 480,
-      },
-    },
-  });
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-  return {
-    props: JSON.parse(JSON.stringify(plant)),
-  };
-};
-
-const Plant: React.FC<
-  Plant & {
-    logs: PlantLog[];
-  }
-> = (props) => {
+const Plant: React.FC = () => {
+  const router = useRouter();
   const { data: session } = useSession();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  async function updateAutomaticWatering(id: string): Promise<void> {
+  const plantId = router.query.id as string;
+
+  const {
+    data: plantData,
+    error,
+    mutate,
+  } = useSWR("/api/plant/" + plantId, fetcher);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutate();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (error) return <p>Cette plante n'a pas été trouvé</p>;
+  if (!plantData) return <p className="h-screen w-screen bg-plant-green"></p>;
+
+  async function updateAutomaticWatering(
+    id: string,
+    currentAutomaticWatering: boolean
+  ): Promise<void> {
     const plantUpdateInput: PlantUpdateInput = {
-      automaticWatering: !props.automaticWatering,
+      automaticWatering: !currentAutomaticWatering,
     };
 
     await fetch(`/api/plant/${id}`, {
       method: "POST",
       body: JSON.stringify(plantUpdateInput),
     });
-    Router.push(`/plant/${id}`);
+
+    mutate();
   }
 
   ChartJS.register(
@@ -100,7 +101,7 @@ const Plant: React.FC<
     },
   };
 
-  const labels = props.logs.map((log) =>
+  const labels = plantData.logs.map((log) =>
     new Date(log.createdAt).toTimeString().slice(0, 5)
   );
 
@@ -110,7 +111,7 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Luminosité",
-        data: props.logs
+        data: plantData.logs
           .slice()
           .reverse()
           .map((log) => {
@@ -128,7 +129,7 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Humidité du sol",
-        data: props.logs
+        data: plantData.logs
           .slice()
           .reverse()
           .map((log) => {
@@ -146,7 +147,7 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Humidité",
-        data: props.logs
+        data: plantData.logs
           .slice()
           .reverse()
           .map((log) => {
@@ -164,7 +165,7 @@ const Plant: React.FC<
       {
         fill: true,
         label: "Temperature",
-        data: props.logs
+        data: plantData.logs
           .slice()
           .reverse()
           .map((log) => {
@@ -182,17 +183,17 @@ const Plant: React.FC<
 
   return (
     <Layout>
-      <div
-        className="min-h-screen bg-cover px-5 pb-5 xl:px-10 xl:pb-10 bg-plant-green"
-      >
-        <h2 className="mb-10 pt-5 text-5xl text-white xl:mb-0">{props.name}</h2>
+      <div className="min-h-screen bg-plant-green bg-cover px-5 pb-5 xl:px-10 xl:pb-10">
+        <h2 className="mb-10 pt-5 text-5xl text-white xl:mb-0">
+          {plantData.name}
+        </h2>
 
         <div className="grid justify-center xl:grid-cols-[30%_70%]">
           <section className="grid xl:mt-16">
             <img
               className="xl:order-0 order-1 w-1/2 max-w-[14rem] justify-self-center xl:m-12 xl:w-full xl:max-w-[19rem]"
-              src={props.image}
-              alt={props.commonName}
+              src={plantData.image}
+              alt={plantData.commonName}
             />
           </section>
 
@@ -202,16 +203,21 @@ const Plant: React.FC<
             <div className="flex flex-wrap items-center gap-4">
               <button
                 className="waterAPlant btn btn-accent flex w-56 items-center justify-center text-white shadow-lg"
-                onClick={() => waterAPlant(props.id)}
+                onClick={() => waterAPlant(plantData.id)}
               >
                 <span>Arroser la plante</span>
               </button>
               <button
-                onClick={() => updateAutomaticWatering(props.id)}
+                onClick={() =>
+                  updateAutomaticWatering(
+                    plantData.id,
+                    plantData.automaticWatering
+                  )
+                }
                 className="btn btn-ghost bg-fuchsia-500 text-white shadow-lg hover:bg-fuchsia-600"
               >
                 Arrosage automatique :{" "}
-                {props.automaticWatering ? "Activé" : "Désactivé"}
+                {plantData.automaticWatering ? "Activé" : "Désactivé"}
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
@@ -224,9 +230,9 @@ const Plant: React.FC<
             <h2 className="mb-4 mt-10 text-2xl text-white">
               📈  Statistiques{" "}
               <span className="ml-2 font-mono text-sm text-gray-100">
-                {props.logs && props.logs.length > 0
+                {plantData.logs && plantData.logs.length > 0
                   ? `Mis à jour ${fromDate(
-                      new Date(props.logs.at(0).createdAt)
+                      new Date(plantData.logs.at(0).createdAt)
                     )}`
                   : ""}
               </span>
@@ -236,11 +242,11 @@ const Plant: React.FC<
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-title">
                   🚰  Dernier arrosage :{" "}
-                  {props.logs && props.logs.length > 0
+                  {plantData.logs && plantData.logs.length > 0
                     ? capitalizeFirstLetter(
                         fromDate(
                           new Date(
-                            new Array(...props.logs).find(
+                            new Array(...plantData.logs).find(
                               (log) => log.wasWatered
                             ).createdAt
                           )
@@ -253,9 +259,9 @@ const Plant: React.FC<
               <div className="rounded-xl bg-white px-4 py-6 text-xl shadow-xl">
                 <div className="collapse-title">
                   🪣  Réservoir :{" "}
-                  {props.logs &&
-                  props.logs.length > 0 &&
-                  props.logs.at(0).waterLevelToLow
+                  {plantData.logs &&
+                  plantData.logs.length > 0 &&
+                  plantData.logs.at(0).waterLevelToLow
                     ? "Il est temps de le remplir !"
                     : "Le réservoir est plein"}
                 </div>
@@ -276,8 +282,8 @@ const Plant: React.FC<
                   />
                   <div className="collapse-title">
                     💦  Humidité dans l'air :{" "}
-                    {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).humidity} %`
+                    {plantData.logs && plantData.logs.length > 0
+                      ? `${plantData.logs.at(0).humidity} %`
                       : "Aucune valeur"}{" "}
                   </div>
                   <div className="collapse-content">
@@ -301,8 +307,8 @@ const Plant: React.FC<
                   />
                   <div className="collapse-title">
                     🪴  Humidité dans le sol :{" "}
-                    {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).soilMoisture} %`
+                    {plantData.logs && plantData.logs.length > 0
+                      ? `${plantData.logs.at(0).soilMoisture} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -326,8 +332,8 @@ const Plant: React.FC<
                   />
                   <div className="collapse-title">
                     💡  Luminosité:{" "}
-                    {props.logs && props.logs.length > 0
-                      ? `${props.logs.at(0).luminosity} %`
+                    {plantData.logs && plantData.logs.length > 0
+                      ? `${plantData.logs.at(0).luminosity} %`
                       : "Aucune valeur"}
                   </div>
                   <div className="collapse-content">
@@ -352,8 +358,8 @@ const Plant: React.FC<
                   <div className="collapse-title">
                     🌡️  Température:{" "}
                     <span className="text-gray-600">
-                      {props.logs && props.logs.length > 0
-                        ? `${props.logs.at(0).temperature} °C`
+                      {plantData.logs && plantData.logs.length > 0
+                        ? `${plantData.logs.at(0).temperature} °C`
                         : "Aucune valeur"}
                     </span>
                   </div>
@@ -378,9 +384,9 @@ const Plant: React.FC<
                 <div>
                   <span className="font-bold">Fréquence d'arrosage :</span>
                   <p>
-                    {props.wateringFrequency == null
+                    {plantData.wateringFrequency == null
                       ? "Aucune Valeur"
-                      : `Tous les ${props.wateringFrequency} jours`}
+                      : `Tous les ${plantData.wateringFrequency} jours`}
                   </p>
                 </div>
                 <div>
@@ -388,9 +394,9 @@ const Plant: React.FC<
                     Quantité d'eau par arrosage :
                   </span>
                   <p>
-                    {props.waterQuantity == null
+                    {plantData.waterQuantity == null
                       ? "Aucune Valeur"
-                      : `${props.waterQuantity} ml`}
+                      : `${plantData.waterQuantity} ml`}
                   </p>
                 </div>
                 <div>
@@ -398,9 +404,9 @@ const Plant: React.FC<
                     Seuil d'humidité de la terre :
                   </span>
                   <p>
-                    {props.soilMoistureThreshold == 0
+                    {plantData.soilMoistureThreshold == 0
                       ? "Aucune Valeur"
-                      : `${props.soilMoistureThreshold} %`}
+                      : `${plantData.soilMoistureThreshold} %`}
                   </p>
                 </div>
                 <div>
@@ -408,9 +414,9 @@ const Plant: React.FC<
                     Seuil d'humidité extérieure :
                   </span>
                   <p>
-                    {props.humidityThreshold == 0
+                    {plantData.humidityThreshold == 0
                       ? "Aucune Valeur"
-                      : `${props.humidityThreshold} %`}
+                      : `${plantData.humidityThreshold} %`}
                   </p>
                 </div>
                 <div>
@@ -418,17 +424,17 @@ const Plant: React.FC<
                     Seuil de température extérieure :
                   </span>
                   <p>
-                    {props.temperatureThreshold == 0
+                    {plantData.temperatureThreshold == 0
                       ? "Aucune Valeur"
-                      : `${props.temperatureThreshold} °C`}
+                      : `${plantData.temperatureThreshold} °C`}
                   </p>
                 </div>
                 <div>
                   <span className="font-bold">Seuil de luminosité :</span>
                   <p>
-                    {props.luminosityThreshold == 0
+                    {plantData.luminosityThreshold == 0
                       ? "Aucune Valeur"
-                      : `${props.luminosityThreshold} %`}
+                      : `${plantData.luminosityThreshold} %`}
                   </p>
                 </div>
               </div>
@@ -440,23 +446,27 @@ const Plant: React.FC<
             <div className="rounded-xl bg-white p-4 shadow-xl">
               <p>
                 <span className="font-bold">Nom commun :</span>{" "}
-                {props.commonName}
+                {plantData.commonName}
               </p>
               <p>
-                <span className="font-bold">Nom latin :</span> {props.latinName}
+                <span className="font-bold">Nom latin :</span>{" "}
+                {plantData.latinName}
               </p>
               <p>
                 <span className="font-bold">Description :</span>{" "}
-                {props.description}
+                {plantData.description}
               </p>
             </div>
           </section>
         </div>
         {showEditModal && (
-          <ModalTreshold plant={props} setShowModal={setShowEditModal} />
+          <ModalTreshold plant={plantData} setShowModal={setShowEditModal} />
         )}
         {showDeleteModal && (
-          <ModalDeletePlant plant={props} setShowModal={setShowDeleteModal} />
+          <ModalDeletePlant
+            plant={plantData}
+            setShowModal={setShowDeleteModal}
+          />
         )}
       </div>
     </Layout>

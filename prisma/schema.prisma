@@ -75,24 +75,26 @@ model VerificationToken {
 }
 
 model Plant {
-  id                    String     @id @default(cuid())
-  name                  String
-  latinName             String
-  commonName            String
-  image                 String?
-  description           String?
-  automaticWatering     Boolean?   @default(true)
-  logs                  PlantLog[]
-  wateringFrequency     Int?
-  luminosityThreshold   Int?
-  temperatureThreshold  Int?
-  waterQuantity         Int?
-  humidityThreshold     Int?
-  soilMoistureThreshold Int?
-  createdAt             DateTime   @default(now()) @map(name: "created_at")
-  updatedAt             DateTime   @updatedAt @map(name: "updated_at")
-  user                  User?      @relation(fields: [userId], references: [id])
-  userId                String?
+  id                              String     @id @default(cuid())
+  name                            String
+  latinName                       String
+  commonName                      String
+  image                           String?
+  description                     String?
+  automaticWatering               Boolean?   @default(true)
+  logs                            PlantLog[]
+  wateringFrequency               Int?
+  luminosityThreshold             Int?
+  temperatureThreshold            Int?
+  waterQuantity                   Int?
+  humidityThreshold               Int?
+  soilMoistureThreshold           Int?
+  thirstyNotificationSent         Boolean?   @default(false)
+  waterLevelToLowNotificationSent Boolean?   @default(false)
+  createdAt                       DateTime   @default(now()) @map(name: "created_at")
+  updatedAt                       DateTime   @updatedAt @map(name: "updated_at")
+  user                            User?      @relation(fields: [userId], references: [id])
+  userId                          String?
 }
 
 model PlantLog {
