@@ -2,6 +2,13 @@
 
 Plant-e is a web application and a prototype of an automatic plant watering system. Plant-e is a connected object powered by an Arduino Nano 33 IOT for the WIFI connection, linked to various sensors, which capture and send the data collected to this web application.
 
+This web application was implemented with the following stack:
+- [**TypeScript**](https://www.typescriptlang.org/): Strongly typed programming language that builds on JavaScript
+- [**Prisma Client**](https://www.prisma.io/docs/concepts/components/prisma-client): Databases access (ORM)                  
+- [**Prisma Migrate**](https://www.prisma.io/docs/concepts/components/prisma-migrate): Database migrations
+- [**Firebase Cloud Messaging**](https://firebase.google.com/products/cloud-messaging): Notifications system
+ 
+
 ## Prerequisites
 
 - Create a GitHub OAuth app to allow signing in via GitHub, you will fill the .env later with the GitHub id and secret.
