@@ -1,4 +1,4 @@
-# PLANT-E 🚰🪴
+# 🚰🪴 PLANT-E
 
 Plant-e is a web application and a prototype of an automatic plant watering system. Plant-e is a connected object powered by an Arduino Nano 33 IOT for the WIFI connection, linked to various sensors, which capture and send the data collected to this web application.
 
